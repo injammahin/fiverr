@@ -9,7 +9,7 @@ export default function Home() {
       {/* TOP HEADER */}
       <header className="w-full flex justify-between items-center px-8 py-5 bg-white/10 backdrop-blur-md shadow-md">
         <h1 className="text-2xl font-bold text-white">
-          ALUXO <span className="font-light">BY Mahin nur</span>
+          ALUXO <span className="font-light">BY ANNUNZIATA TREUHAND</span>
         </h1>
 
         {/* LOGIN BUTTON */}
@@ -30,6 +30,13 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      {/* BOTTOM FOOTER (similar to your reference image) */}
+      <footer className="w-full flex justify-center items-center py-4 bg-white/10 backdrop-blur-md mt-auto">
+        <p className="text-white text-sm">
+          More than 90,000 companies trust ALUXO – the simple business software for self-employed, small businesses, and start-ups.
+        </p>
+      </footer>
     </div>
   );
 }

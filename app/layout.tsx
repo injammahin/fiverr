@@ -1,4 +1,4 @@
-"use client"; // Add this directive to make this a client component
+"use client"; 
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
@@ -6,17 +6,27 @@ import TopBar from "./components/TopBar";
 import LogoHeader from "./components/LogoHeader";
 import MainNavbar from "./components/MainNavbar";
 import { usePathname } from "next/navigation";
+import Loader from './components/Loader';
+import { useEffect, useState } from 'react';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname(); // Get current path
+  const pathname = usePathname(); 
+  const [loading, setLoading] = useState(true);
 
-  // Check if we are on the Main Page ("/") or Login Page ("/login")
   const isExcludedPage = pathname === "/" || pathname === "/login";
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false); 
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <html lang="en">
       <body className="bg-light">
-        {/* Conditionally render headers */}
+        {loading && <Loader />}
         {!isExcludedPage && (
           <>
             <TopBar />
@@ -27,7 +37,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </>
         )}
-        {/* Ensure children are rendered on excluded pages */}
         {isExcludedPage && children}
       </body>
     </html>
