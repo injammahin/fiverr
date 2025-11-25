@@ -1,137 +1,156 @@
 "use client";
 
 import { Home, Search, ChevronDown } from "lucide-react";
+import Link from "next/link";
 
 export default function MainNavbarCompact() {
-    return (
-        <>
-            <nav className="aluxo-nav">
-                <div className="aluxo-nav-left">
+  return (
+    <>
+      <nav className="aluxo-nav">
+        <div className="aluxo-nav-left">
 
-                    {/* HOME */}
-                    <div className="aluxo-nav-item">
-                        <a className="aluxo-nav-link">
-                            <Home size={16} />
-                        </a>
-                    </div>
+          {/* HOME */}
+          <div className="aluxo-nav-item">
+            <Link href="/" className="aluxo-nav-link">
+              <Home size={16} />
+            </Link>
+          </div>
 
-                    {/* CONTACTS */}
-                    <div className="aluxo-nav-item">
-                        <a className="aluxo-nav-link">Contacts</a>
-                    </div>
+          {/* CONTACTS */}
+          <div className="aluxo-nav-item">
+            <Link href="/contacts" className="aluxo-nav-link">
+              Contacts
+            </Link>
+          </div>
 
-                    {/* SALES */}
-                    <div className="aluxo-nav-item aluxo-has-dropdown">
-                        <a className="aluxo-nav-link">
-                            Sales <ChevronDown size={12} />
-                        </a>
-                        <ul className="aluxo-dropdown">
-                            <span className="aluxo-dropdown-arrow"></span>
-                            <li><a className="aluxo-dropdown-item">Offers</a></li>
-                            <li><a className="aluxo-dropdown-item">Orders</a></li>
-                            <li><a className="aluxo-dropdown-item">Invoices</a></li>
-                        </ul>
-                    </div>
+          {/* SALES */}
+          <div className="aluxo-nav-item aluxo-has-dropdown">
+            <span className="aluxo-nav-link">
+              Sales <ChevronDown size={12} />
+            </span>
+            <ul className="aluxo-dropdown">
+              <span className="aluxo-dropdown-arrow"></span>
+              <li><Link href="/sales/quotes" className="aluxo-dropdown-item">Quotes</Link></li>
+              <li><Link href="/sales/orders" className="aluxo-dropdown-item">Orders</Link></li>
+              <li><Link href="/sales/invoices" className="aluxo-dropdown-item">Invoices</Link></li>
+              <li><Link href="/sales/credit-notes" className="aluxo-dropdown-item">Credit notes</Link></li>
+              <li><Link href="/sales/other" className="aluxo-dropdown-item">Other</Link></li>
+            </ul>
+          </div>
 
-                    {/* PROJECTS */}
-                    <div className="aluxo-nav-item aluxo-has-dropdown">
-                        <a className="aluxo-nav-link">
-                            Projects <ChevronDown size={12} />
-                        </a>
-                        <ul className="aluxo-dropdown">
-                            <span className="aluxo-dropdown-arrow"></span>
-                            <li><a className="aluxo-dropdown-item">Overview</a></li>
-                            <li><a className="aluxo-dropdown-item">Time tracking</a></li>
-                        </ul>
-                    </div>
+          {/* PROJECTS */}
+          <div className="aluxo-nav-item aluxo-has-dropdown">
+            <span className="aluxo-nav-link">
+              Projects <ChevronDown size={12} />
+            </span>
+            <ul className="aluxo-dropdown">
+              <span className="aluxo-dropdown-arrow"></span>
+              <li><Link href="/projects" className="aluxo-dropdown-item">Projects</Link></li>
+              <li><Link href="/projects/time-tracking" className="aluxo-dropdown-item">Time tracking</Link></li>
+            </ul>
+          </div>
 
-                    {/* PRODUCTS */}
-                    <div className="aluxo-nav-item aluxo-has-dropdown">
-                        <a className="aluxo-nav-link">
-                            Products <ChevronDown size={12} />
-                        </a>
-                        <ul className="aluxo-dropdown">
-                            <span className="aluxo-dropdown-arrow"></span>
-                            <li><a className="aluxo-dropdown-item">Items</a></li>
-                            <li><a className="aluxo-dropdown-item">Stock</a></li>
-                        </ul>
-                    </div>
+          {/* PRODUCTS */}
+          <div className="aluxo-nav-item aluxo-has-dropdown">
+            <span className="aluxo-nav-link">
+              Products <ChevronDown size={12} />
+            </span>
+            <ul className="aluxo-dropdown">
+              <span className="aluxo-dropdown-arrow"></span>
+              <li><Link href="/products" className="aluxo-dropdown-item">Products</Link></li>
+              <li><Link href="/products/in-out" className="aluxo-dropdown-item">Incoming/outgoing items</Link></li>
+              <li><Link href="/products/inventory" className="aluxo-dropdown-item">Inventory</Link></li>
+            </ul>
+          </div>
 
-                    {/* PURCHASES */}
-                    <div className="aluxo-nav-item aluxo-has-dropdown">
-                        <a className="aluxo-nav-link">
-                            Purchases <ChevronDown size={12} />
-                        </a>
-                        <ul className="aluxo-dropdown">
-                            <span className="aluxo-dropdown-arrow"></span>
-                            <li><a className="aluxo-dropdown-item">Bills</a></li>
-                            <li><a className="aluxo-dropdown-item">Suppliers</a></li>
-                        </ul>
-                    </div>
+          {/* PURCHASES */}
+          <div className="aluxo-nav-item aluxo-has-dropdown">
+            <span className="aluxo-nav-link">
+              Purchases <ChevronDown size={12} />
+            </span>
+            <ul className="aluxo-dropdown">
+              <span className="aluxo-dropdown-arrow"></span>
+              <li><Link href="/purchases/orders" className="aluxo-dropdown-item">Purchase orders</Link></li>
+              <li><Link href="/purchases/bills" className="aluxo-dropdown-item">Bills</Link></li>
+              <li><Link href="/purchases/vendor-credit-notes" className="aluxo-dropdown-item">Vendor credit notes</Link></li>
+              <li><Link href="/purchases/expenses" className="aluxo-dropdown-item">Expenses</Link></li>
+            </ul>
+          </div>
 
-                    {/* BANKING */}
-                    <div className="aluxo-nav-item">
-                        <a className="aluxo-nav-link">Banking</a>
-                    </div>
+          {/* BANKING */}
+          <div className="aluxo-nav-item">
+            <Link href="/banking" className="aluxo-nav-link">
+              Banking
+            </Link>
+          </div>
 
-                    {/* ACCOUNTING */}
-                    <div className="aluxo-nav-item aluxo-has-dropdown">
-                        <a className="aluxo-nav-link">
-                            Accounting <ChevronDown size={12} />
-                        </a>
-                        <ul className="aluxo-dropdown">
-                            <span className="aluxo-dropdown-arrow"></span>
-                            <li><a className="aluxo-dropdown-item">Manual entry</a></li>
-                            <li><a className="aluxo-dropdown-item">VAT</a></li>
-                            <li><a className="aluxo-dropdown-item">Reports</a></li>
-                        </ul>
-                    </div>
+          {/* ACCOUNTING */}
+          <div className="aluxo-nav-item aluxo-has-dropdown">
+            <span className="aluxo-nav-link">
+              Accounting <ChevronDown size={12} />
+            </span>
+            <ul className="aluxo-dropdown">
+              <span className="aluxo-dropdown-arrow"></span>
 
-                    {/* MORE */}
-                    <div className="aluxo-nav-item aluxo-has-dropdown">
-                        <a className="aluxo-nav-link">
-                            More <ChevronDown size={12} />
-                        </a>
-                        <ul className="aluxo-dropdown">
-                            <span className="aluxo-dropdown-arrow"></span>
-                            <li><a className="aluxo-dropdown-item">Administration</a></li>
-                            <li><a className="aluxo-dropdown-item">User roles</a></li>
-                        </ul>
-                    </div>
+              <li>
+                <Link href="/Accounting/manual-entry" className="aluxo-dropdown-item">
+                  Manual entry
+                </Link>
+              </li>
 
-                    {/* FINANCIAL SERVICES */}
-                    <div className="aluxo-nav-item aluxo-has-dropdown">
-                        <a className="aluxo-nav-link">
-                            Financial services <ChevronDown size={12} />
-                        </a>
-                        <ul className="aluxo-dropdown">
-                            <span className="aluxo-dropdown-arrow"></span>
-                            <li><a className="aluxo-dropdown-item">Overview</a></li>
-                        </ul>
-                    </div>
-                </div>
+              <li><Link href="/Accounting/vat" className="aluxo-dropdown-item">VAT</Link></li>
+              <li><Link href="/Accounting/year-end" className="aluxo-dropdown-item">Year-end closing</Link></li>
+              <li><Link href="/Accounting/reports" className="aluxo-dropdown-item">Reports</Link></li>
+            </ul>
+          </div>
 
-                {/* RIGHT SEARCH */}
-                <div className="aluxo-nav-search">
-                    <Search size={16} color="#0a2330" />
-                    <input placeholder="Quick find" />
-                </div>
+          {/* MORE */}
+          <div className="aluxo-nav-item aluxo-has-dropdown">
+            <span className="aluxo-nav-link">
+              More <ChevronDown size={12} />
+            </span>
 
-            </nav>
+            <ul className="aluxo-dropdown">
+              <span className="aluxo-dropdown-arrow"></span>
+              <li><Link href="/apps" className="aluxo-dropdown-item">Apps</Link></li>
+              <li><Link href="/inbox" className="aluxo-dropdown-item">Inbox</Link></li>
+              <li><Link href="/tasks" className="aluxo-dropdown-item">Tasks</Link></li>
+            </ul>
+          </div>
 
-            <style jsx global>{`
-  /* NAVBAR */
+          {/* FINANCIAL SERVICES */}
+          <div className="aluxo-nav-item aluxo-has-dropdown">
+            <span className="aluxo-nav-link">
+              Financial services <ChevronDown size={12} />
+            </span>
+
+            <ul className="aluxo-dropdown">
+              <span className="aluxo-dropdown-arrow"></span>
+              <li><Link target="_blank" href={"https://marketplace.bexio.com/en-GB/apps/127056/bexio-pay?utm_source=internal&utm_medium=link&utm_campaign=20250702-bexio-office-de&utm_content=financial-services_bexio-pay"} className="aluxo-dropdown-item">bexio Pay ↗</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* SEARCH BAR */}
+        <div className="aluxo-nav-search">
+          <Search size={16} color="#0a2330" />
+          <input placeholder="Quick find" />
+        </div>
+      </nav>
+
+
+      {/* ---------- CSS ---------- */}
+      <style jsx global>{`
   .aluxo-nav {
     background: #0f3a4f;
     height: 48px;
-    padding: 0 16px;
+    padding: 0 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    overflow: visible; /* IMPORTANT: allow dropdowns */
+    overflow: visible;
   }
 
-  /* LEFT MENU */
   .aluxo-nav-left {
     display: flex;
     align-items: center;
@@ -139,46 +158,44 @@ export default function MainNavbarCompact() {
 
   .aluxo-nav-item {
     margin-right: 14px;
-    position: relative; /* must be relative for dropdown centering */
+    position: relative;
   }
 
   .aluxo-nav-link {
     font-size: 14px;
     color: white;
     text-decoration: none;
-    padding: 4px 3px;
+    padding: 5px 6px;
     display: flex;
     align-items: center;
+    border-radius: 4px;
   }
 
-  .aluxo-nav-link:hover {
-    background: #144b60;
-    border-radius: 4px;
+  .aluxo-nav-item:hover > .aluxo-nav-link {
+    background: #1b5a75;
   }
 
   /* SEARCH */
   .aluxo-nav-search {
     background: white;
     border-radius: 4px;
-    padding: 2px 6px;
+    padding: 3px 6px;
     border: 2px solid #0f3a4f;
     display: flex;
     align-items: center;
-    width: 200px;
+    width: 210px;
   }
 
   .aluxo-nav-search input {
     border: none;
     outline: none;
     width: 100%;
-    font-size: 13px;
     margin-left: 6px;
+    font-size: 13px;
   }
 
-  /* DROPDOWN — FIXED PERFECT */
-  .aluxo-has-dropdown {
-    position: relative;
-  }
+  /* DROPDOWNS */
+  .aluxo-has-dropdown { position: relative; }
 
   .aluxo-dropdown {
     display: none;
@@ -188,15 +205,14 @@ export default function MainNavbarCompact() {
     transform: translateX(-50%);
     margin-top: 10px;
 
-    background: white;
-    min-width: 170px;
-    border-radius: 10px;
-    padding: 6px 0;
+    background: #fff;
+    min-width: 200px;
+    border-radius: 8px;
+    padding: 8px 0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     z-index: 999;
   }
 
-  /* ARROW — perfectly centered */
   .aluxo-dropdown-arrow {
     position: absolute;
     top: -10px;
@@ -208,17 +224,16 @@ export default function MainNavbarCompact() {
   }
 
   .aluxo-dropdown-item {
-    padding: 8px 12px;
-    font-size: 14px;
     display: block;
+    padding: 8px 14px;
+    font-size: 14px;
     color: #333;
   }
 
   .aluxo-dropdown-item:hover {
-    background: #f4f6f8;
+    background: #eef3f6;
   }
 
-  /* HOVER TO OPEN */
   .aluxo-has-dropdown:hover > .aluxo-dropdown {
     display: block;
   }
@@ -231,21 +246,18 @@ export default function MainNavbarCompact() {
       align-items: flex-start;
       padding: 12px;
     }
-
     .aluxo-nav-search {
       width: 100%;
       margin-top: 10px;
     }
-
     .aluxo-nav-left {
       flex-wrap: wrap;
     }
-
     .aluxo-nav-item {
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
   }
 `}</style>
-        </>
-    );
+    </>
+  );
 }
