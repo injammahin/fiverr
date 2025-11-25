@@ -27,7 +27,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </>
         )}
-        
+        {/* Ensure children are rendered on excluded pages */}
+        {isExcludedPage && children}
       </body>
     </html>
   );
