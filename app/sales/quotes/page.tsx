@@ -19,7 +19,7 @@ export default function QuotesPage() {
             <div></div> {/* Placeholder for alignment */}
             <Link
               className="btn btn-success"
-              href={"./quotes/addquote"} // Navigates to the addquote page
+              href={"./quotes/new"} 
             >
               New quote
             </Link>

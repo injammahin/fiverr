@@ -1,6 +1,14 @@
 "use client";
+
+import { useEffect, useState } from "react";
 import { Home, Search, ChevronDown } from "lucide-react";
+
 export default function LogoHeader() {
+    // Prevent SSR → Fixes layout breaking before hydration
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => setMounted(true), []);
+    if (!mounted) return null;
+
     return (
         <>
             <div className="aluxo-logo-header">
@@ -17,7 +25,7 @@ export default function LogoHeader() {
                     {/* USER */}
                     <div className="dropdown lh-item">
                         <a className="lh-link">
-                            <img src="https://my.bexio.com/profile/images/c518a6af-8fe5-4833-8fd8-5a6d55396496.png?type=thumb" className="lh-avatar"/>
+                            <img src="/images/test.png" loading="lazy" className="lh-avatar"/>
                             Test <ChevronDown size={14} />
                         </a>
 
@@ -31,7 +39,7 @@ export default function LogoHeader() {
                     {/* MARKETPLACE */}
                     <div className="dropdown lh-item">
                         <a className="lh-link">
-                            🏬 Marketplace<ChevronDown size={14} />
+                            🏬 Marketplace <ChevronDown size={14} />
                         </a>
 
                         <ul className="dropdown-menu lh-dropdown">
@@ -44,7 +52,7 @@ export default function LogoHeader() {
                     {/* SETTINGS */}
                     <div className="dropdown lh-item">
                         <a className="lh-link">
-                            ⚙️ Settings<ChevronDown size={14} />
+                            ⚙️ Settings <ChevronDown size={14} />
                         </a>
 
                         <ul className="dropdown-menu lh-dropdown">
@@ -60,6 +68,7 @@ export default function LogoHeader() {
 
                 </div>
             </div>
+
 
             {/* ---------- CSS ---------- */}
             <style jsx global>{`

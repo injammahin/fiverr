@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import OrderTabs from "./components/OrderTabs";
 
 export default function OrdersPage() {
   const [search, setSearch] = useState("");
@@ -22,9 +23,9 @@ export default function OrdersPage() {
         <div className="d-flex justify-content-between align-items-center">
       <h3 className="mb-3">Orders</h3>
       {/* New Order Button */}
-      <Link href="./orders/addorder">
-        <button className="btn btn-success mt-4">New order</button>
-      </Link>
+      <Link href="./orders/new" className="btn btn-success fw-semibold px-3">
+            New Orders
+          </Link>
    </div>
       {/* Filter + Search */}
       <div className="d-flex justify-content-between align-items-center mt-3 mb-3">

@@ -2,8 +2,12 @@
 
 import { Home, Search, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function MainNavbarCompact() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
   return (
     <>
       <nav className="aluxo-nav">
@@ -11,7 +15,7 @@ export default function MainNavbarCompact() {
 
           {/* HOME */}
           <div className="aluxo-nav-item">
-            <Link href="/" className="aluxo-nav-link">
+            <Link href="/dashboard" className="aluxo-nav-link">
               <Home size={16} />
             </Link>
           </div>
@@ -115,18 +119,6 @@ export default function MainNavbarCompact() {
               <li><Link href="/apps" className="aluxo-dropdown-item">Apps</Link></li>
               <li><Link href="/inbox" className="aluxo-dropdown-item">Inbox</Link></li>
               <li><Link href="/tasks" className="aluxo-dropdown-item">Tasks</Link></li>
-            </ul>
-          </div>
-
-          {/* FINANCIAL SERVICES */}
-          <div className="aluxo-nav-item aluxo-has-dropdown">
-            <span className="aluxo-nav-link">
-              Financial services <ChevronDown size={12} />
-            </span>
-
-            <ul className="aluxo-dropdown">
-              <span className="aluxo-dropdown-arrow"></span>
-              <li><Link target="_blank" href={"https://marketplace.bexio.com/en-GB/apps/127056/bexio-pay?utm_source=internal&utm_medium=link&utm_campaign=20250702-bexio-office-de&utm_content=financial-services_bexio-pay"} className="aluxo-dropdown-item">bexio Pay ↗</Link></li>
             </ul>
           </div>
         </div>
