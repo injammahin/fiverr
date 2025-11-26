@@ -7,7 +7,7 @@ export default function DocumentFlow() {
       <table className="table">
         <thead>
           <tr>
-            <th>Date</th>
+            <th>Datse</th>
             <th>Document</th>
             <th>Title</th>
             <th>Currency</th>

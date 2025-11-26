@@ -1,6 +1,6 @@
 "use client";
 
-export default function Conditions() {
+export default function Milestones() {
   return (
     <div className="editor-section">
 

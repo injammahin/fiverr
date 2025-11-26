@@ -2,18 +2,21 @@
 
 import { useState } from "react";
 import Tabs from "./Tabs";
-import Items from "./Items";
+import Dashboard from "./Dashboard";
+import Milestones from "./Milestones";
+import Workpackages from "./Workpackages";
+import Task from "./Task";
+import Timetracking from "./Timetracking";
+import Team from "./Team";
 import Conditions from "./Conditions";
-import Address from "./Address";
-import Texts from "./Texts";
-import DocumentFlow from "./DocumentFlow";
+import Expenses from "./Expenses";
 import Sidebar from "./Sidebar";
-import Comments from "./Comments";
-import Settings from "./Settings";
+import DocumentFlow from "./DocumentFlow";
+
 import "./styles.css";
 
 export default function InvoiceEditorPage() {
-  const [activeTab, setActiveTab] = useState("items");
+  const [activeTab, setActiveTab] = useState("Dashboard");
 
   return (
     <div className="invoice-editor-wrapper">
@@ -26,12 +29,15 @@ export default function InvoiceEditorPage() {
         {/* LEFT MAIN PANEL */}
         <div className="invoice-left">
 
-          {activeTab === "items" && <Items />}
-          {activeTab === "conditions" && <Conditions />}
-          {activeTab === "address" && <Address />}
-          {activeTab === "texts" && <Texts />}
-          {activeTab === "document" && <DocumentFlow />}
-          {activeTab === "settings" && <Settings />}
+          {activeTab === "Tasks" && <Task />}
+          {activeTab === "Dashboard" && <Dashboard />}
+          {activeTab === "Milestones" && <Milestones />}
+          {activeTab === "Timetracking" && <Timetracking />}
+          {activeTab === "Team" && <Team />}
+          {activeTab === "Conditions" && <Conditions />}
+          {activeTab === "Expenses" && <Expenses />}
+          {activeTab === "Workpackages" && <Workpackages />}
+          {activeTab === "DocumentFlow" && <DocumentFlow />}
 
           {/* Comments always shown under content */}
           {/* <Comments /> */}
