@@ -134,7 +134,7 @@ export default function MainNavbarCompact() {
       {/* ---------- CSS ---------- */}
       <style jsx global>{`
   .aluxo-nav {
-    background: #0f3a4f;
+    background: #ffa503;
     height: 48px;
     padding: 0 14px;
     display: flex;
@@ -164,7 +164,7 @@ export default function MainNavbarCompact() {
   }
 
   .aluxo-nav-item:hover > .aluxo-nav-link {
-    background: #1b5a75;
+    background: #c88307;
   }
 
   /* SEARCH */
