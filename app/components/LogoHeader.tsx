@@ -14,9 +14,11 @@ export default function LogoHeader() {
             <div className="aluxo-logo-header">
                 {/* LEFT LOGO */}
                 <div className="lh-left">
-                    <a className="lh-logo" href="#">
-                        ALUXO <span>BY ANNUNZIATA TREUHAND</span>
+                    <a className="lh-logo d-flex flex-column text-decoration-none" href="#">
+                        <span className="aluxo-title">ALUXO</span>
+                        <span className="aluxo-subtitle">by Annunziata Treuhand</span>
                     </a>
+
                 </div>
 
                 {/* RIGHT MENUS */}
@@ -25,7 +27,7 @@ export default function LogoHeader() {
                     {/* USER */}
                     <div className="dropdown lh-item">
                         <a className="lh-link">
-                            <img src="/images/test.png" loading="lazy" className="lh-avatar"/>
+                            <img src="/images/test.png" loading="lazy" className="lh-avatar" />
                             Test <ChevronDown size={14} />
                         </a>
 
@@ -205,6 +207,21 @@ export default function LogoHeader() {
         margin-right: 20px;
     }
 }
+    .aluxo-title {
+  color: #dd9c4a;       /* your orange color */
+  font-size: 32px;      /* large and dominant */
+  font-weight: 700;
+  line-height: 1;
+}
+
+.aluxo-subtitle {
+  font-size: 10px;      /* much smaller */
+  color: #555;          /* soft, subtle grey */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
 `}</style>
         </>
     );
