@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname(); 
   const [loading, setLoading] = useState(true);
 
-  const isExcludedPage = pathname === "/" || pathname === "/login";
+  const isExcludedPage = pathname === "/" || pathname === "/login" ||  pathname.startsWith("/cockpit");
 
   useEffect(() => {
     const timer = setTimeout(() => {

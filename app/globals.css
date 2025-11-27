@@ -25,7 +25,7 @@
     padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
     font-size: var(--bs-nav-link-font-size);
     font-weight: var(--bs-nav-link-font-weight);
-    color: #e79b0e   !important;
+    color: #dd9c4a   !important;
     background: none;
     border: 0;
     text-decoration: none;
@@ -43,7 +43,7 @@ body {
 }
 
 .top-bar {
-  background-color: #FFA500;
+  background-color: #e18108;
   /* teal */
   color: #ffffff;
   font-size: 0.9rem;

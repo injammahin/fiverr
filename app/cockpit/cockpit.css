@@ -1,0 +1,43 @@
+.cockpit-container {
+  height: 100vh;
+  background: #f5f7fa;
+}
+
+.cockpit-sidebar {
+  width: 210px;
+  background: #0c344c;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.cockpit-logo {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.cockpit-logo span {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.cockpit-sidebar ul li {
+  padding: 8px 0;
+}
+
+.cockpit-sidebar ul li a {
+  color: #b8c7d1;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+.cockpit-sidebar ul li.active a,
+.cockpit-sidebar ul li a:hover {
+  color: #fff;
+  font-weight: 600;
+}
+
+.cockpit-content {
+  background: #f8fafc;
+  overflow-y: auto;
+}

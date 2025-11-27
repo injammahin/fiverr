@@ -134,7 +134,7 @@ export default function MainNavbarCompact() {
       {/* ---------- CSS ---------- */}
       <style jsx global>{`
   .aluxo-nav {
-    background: #ffa503;
+    background: #e18108;
     height: 48px;
     padding: 0 14px;
     display: flex;
