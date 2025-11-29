@@ -22,19 +22,17 @@
 
 /* app/globals.css */
 .nav-link {
-    padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
-    font-size: var(--bs-nav-link-font-size);
-    font-weight: var(--bs-nav-link-font-weight);
-    color: #dd9c4a   !important;
-    background: none;
-    border: 0;
-    text-decoration: none;
-    transition: color .15s 
-ease-in-out, background-color .15s 
-ease-in-out, border-color .15s 
-ease-in-out;
-    display: block;
+  padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x);
+  font-size: var(--bs-nav-link-font-size);
+  font-weight: var(--bs-nav-link-font-weight);
+  color: #dd9c4a !important;
+  background: none;
+  border: 0;
+  text-decoration: none;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+  display: block;
 }
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -105,7 +103,7 @@ a {
 }
 
 .navbar-bexio .nav-link:hover {
-  background-color: #e79b0e  !important;
+  background-color: #e79b0e !important;
   color: #ffffff !important;
 }
 
@@ -156,6 +154,7 @@ a {
 .search-wrapper svg {
   margin-right: 4px;
 }
+
 .loader {
   position: fixed;
   top: 0;
@@ -182,11 +181,68 @@ a {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
+
 .text-primary {
-    --bs-text-opacity: 1;
-    color: #e79b0e  !important;
+  --bs-text-opacity: 1;
+  color: #e79b0e !important;
+}
+
+.btn-orange {
+  background: #e18107;
+  color: white;
+}
+
+.btn-orange:hover {
+  background: #d07e15;
+  color: white;
+}
+
+.btn-success {
+  background: #e18107;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #d07e15;
+  color: white;
+}
+
+.btn-primary {
+  background: #e18107;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #d07e15 !important;
+  color: white;
+}
+
+a {
+  color: #e18107;
+  text-decoration: underline;
+}
+
+/* a:hover {
+  color: #e18107;
+  text-decoration: underline;
+} */
+
+.btn-link {
+  color: #e18107;
+}
+
+.btn-link:hover {
+  color: #e18107;
+  text-decoration: underline;
+}
+
+.editor-tabs .active {
+  color: #e18107 !important;
+  border-bottom: 3px solid #e18107 !important;
+  font-weight: bold;
 }

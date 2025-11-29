@@ -8,7 +8,7 @@ export default function EditContactPage({ params }: any) {
     return (
       <div className="container mt-4">
         <h4>Contact not found</h4>
-        <a href="/contacts" className="btn btn-primary mt-3">Back</a>
+        <a href="/contacts" className="btn btn-orange mt-3">Back</a>
       </div>
     );
   }

@@ -116,9 +116,9 @@ export default function MainNavbarCompact() {
 
             <ul className="aluxo-dropdown">
               <span className="aluxo-dropdown-arrow"></span>
-              <li><Link href="/apps" className="aluxo-dropdown-item">Apps</Link></li>
-              <li><Link href="/inbox" className="aluxo-dropdown-item">Inbox</Link></li>
-              <li><Link href="/tasks" className="aluxo-dropdown-item">Tasks</Link></li>
+              <li><Link href="/more/apps" className="aluxo-dropdown-item">Apps</Link></li>
+              <li><Link href="/more/inbox" className="aluxo-dropdown-item">Inbox</Link></li>
+              <li><Link href="/more/tasks" className="aluxo-dropdown-item">Tasks</Link></li>
             </ul>
           </div>
         </div>
