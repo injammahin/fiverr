@@ -1,49 +1,132 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Home, Search, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { API_BASE_URL } from "@/app/config/api";
 
 export default function LogoHeader() {
-    // Prevent SSR → Fixes layout breaking before hydration
     const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
+    const [userName, setUserName] = useState("Loading...");
+
+    // ----------------------------------------------------
+    // FETCH USER DETAILS
+    // ----------------------------------------------------
+    const fetchUser = async () => {
+        try {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                console.log("⚠ No token found in localStorage");
+                return;
+            }
+
+            console.log("🔵 Fetching user from:", `${API_BASE_URL}/user`);
+
+            const res = await fetch(`${API_BASE_URL}/user`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                credentials: "include",
+            });
+
+            console.log("🟢 API status:", res.status);
+
+            if (!res.ok) {
+                console.log("❌ User fetch failed:", res.status);
+                return;
+            }
+
+            const data = await res.json();
+            console.log("✅ User data:", data);
+
+            const name =
+                data.username ??
+                (data.company ? data.company.split(" ")[0] : "User");
+
+            setUserName(name);
+        } catch (error) {
+            console.log("🔥 User fetch error:", error);
+        }
+    };
+
+    // ----------------------------------------------------
+    // LOGOUT
+    // ----------------------------------------------------
+    const logout = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+
+            console.log("🔵 Logging out:", `${API_BASE_URL}/logout`);
+
+            await fetch(`${API_BASE_URL}/logout`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+        } catch (error) {
+            console.log("Logout error:", error);
+        }
+    };
+
+    // ----------------------------------------------------
+    // MOUNT + FETCH USER
+    // ----------------------------------------------------
+    useEffect(() => {
+        setMounted(true);
+        fetchUser();
+    }, []);
+
     if (!mounted) return null;
 
     return (
         <>
             <div className="aluxo-logo-header">
+
                 {/* LEFT LOGO */}
                 <div className="lh-left">
                     <a className="lh-logo d-flex flex-column text-decoration-none" href="#">
                         <span className="aluxo-title">ALUXO</span>
                         <span className="aluxo-subtitle">by Annunziata Treuhand</span>
                     </a>
-
                 </div>
 
                 {/* RIGHT MENUS */}
                 <div className="lh-right">
 
-                    {/* USER */}
+                    {/* USER MENU */}
                     <div className="dropdown lh-item">
                         <a className="lh-link">
                             <img src="/images/test.png" loading="lazy" className="lh-avatar" />
-                            Test <ChevronDown size={14} />
+                            {userName} <ChevronDown size={14} />
                         </a>
 
                         <ul className="dropdown-menu lh-dropdown">
                             <span className="dropdown-arrow"></span>
-                            <li><a className="dropdown-item">Edit profile</a></li>
-                            <li><a className="dropdown-item">Log out</a></li>
+
+                            <li>
+                                <button className="dropdown-item logout-btn">
+                                    Edit profile
+                                </button>
+                            </li>
+
+                            <li>
+                                <button className="dropdown-item logout-btn" onClick={logout}>
+                                    Log out
+                                </button>
+                            </li>
                         </ul>
                     </div>
 
                     {/* MARKETPLACE */}
                     <div className="dropdown lh-item">
-                        <a className="lh-link">
-                            🏬 Marketplace <ChevronDown size={14} />
-                        </a>
-
+                        <a className="lh-link">🏬 Marketplace <ChevronDown size={14} /></a>
                         <ul className="dropdown-menu lh-dropdown">
                             <span className="dropdown-arrow"></span>
                             <li><a className="dropdown-item">Discover new apps ↗</a></li>
@@ -53,10 +136,7 @@ export default function LogoHeader() {
 
                     {/* SETTINGS */}
                     <div className="dropdown lh-item">
-                        <a className="lh-link">
-                            ⚙️ Settings <ChevronDown size={14} />
-                        </a>
-
+                        <a className="lh-link">⚙️ Settings <ChevronDown size={14} /></a>
                         <ul className="dropdown-menu lh-dropdown">
                             <span className="dropdown-arrow"></span>
                             <li><a className="dropdown-item">All settings</a></li>
@@ -71,9 +151,23 @@ export default function LogoHeader() {
                 </div>
             </div>
 
-
-            {/* ---------- CSS ---------- */}
+            {/* ----------------------------------------------------
+                CSS
+            ---------------------------------------------------- */}
             <style jsx global>{`
+.logout-btn {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 15px;
+    cursor: pointer;
+}
+.logout-btn:hover {
+    background: #f5f7f9;
+}
+
 /* HEADER BASE */
 .aluxo-logo-header {
     height: 65px;
@@ -82,73 +176,51 @@ export default function LogoHeader() {
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #eee;
-
     position: relative;
-    overflow: visible; /* allow dropdowns inside container */
+    overflow: visible;
 }
 
-/* LOGO */
 .lh-logo {
     font-size: 26px;
     font-weight: 700;
     text-decoration: none;
     color: #111;
 }
-
 .lh-logo span {
     font-weight: 300;
 }
 
-/* RIGHT SIDE MENUS */
 .lh-right {
     display: flex;
     align-items: center;
 }
 
-/* DROPDOWN TRIGGER */
 .lh-item {
     margin-left: 22px;
     position: relative;
 }
-
 .lh-link {
     display: flex;
     align-items: center;
     font-size: 15px;
     color: #16689a !important;
     cursor: pointer;
-    padding: 6px 4px;
-    text-decoration: none;
 }
-
 .lh-avatar {
     height: 20px;
     margin-right: 6px;
-    opacity: 0.7;
 }
 
-/* ---------------- DROPDOWN ---------------- */
 .lh-dropdown {
     position: absolute;
     top: calc(100% + 10px);
-
-    /* Prevent breaking outside container */
-    max-width: calc(100vw - 40px);
     width: max-content;
-    white-space: nowrap;
-
-    left: 0;             /* default position */
-    right: auto;
-
     display: none;
-    padding: 8px 0;
-    border-radius: 10px;
     background: white;
+    border-radius: 10px;
+    padding: 8px 0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 9999;
 }
-
-/* Arrow */
 .dropdown-arrow {
     position: absolute;
     top: -10px;
@@ -157,71 +229,24 @@ export default function LogoHeader() {
     border-right: 10px solid transparent;
     border-bottom: 10px solid white;
 }
-
-/* Items */
-.dropdown-item {
-    padding: 10px 16px;
-    font-size: 15px;
-    display: block;
-    color: #333;
-}
-
 .dropdown-item:hover {
     background: #f5f7f9;
 }
 
-/* SHOW ON HOVER */
 .lh-item:hover > .lh-dropdown {
     display: block;
 }
 
-/* ---------------- FLIP LOGIC (IMPORTANT) ---------------- */
-/* If dropdown is near right edge, flip to left */
-.lh-item:hover .lh-dropdown {
-    right: 0;
-    left: auto;
+.aluxo-title {
+    color: #dd9c4a;
+    font-size: 32px;
+    font-weight: 700;
 }
-
-/* Arrow also flips */
-.lh-item:hover .dropdown-arrow {
-    right: 20px;
-    left: auto;
-}
-
-/* ---------------- RESPONSIVE ---------------- */
-@media (max-width: 768px) {
-    .aluxo-logo-header {
-        flex-direction: column;
-        align-items: flex-start;
-        height: auto;
-        padding: 14px;
-    }
-
-    .lh-right {
-        flex-wrap: wrap;
-        margin-top: 10px;
-    }
-
-    .lh-item {
-        margin-left: 0;
-        margin-right: 20px;
-    }
-}
-    .aluxo-title {
-  color: #dd9c4a;       /* your orange color */
-  font-size: 32px;      /* large and dominant */
-  font-weight: 700;
-  line-height: 1;
-}
-
 .aluxo-subtitle {
-  font-size: 10px;      /* much smaller */
-  color: #555;          /* soft, subtle grey */
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 2px;
+    font-size: 10px;
+    color: #555;
+    text-transform: uppercase;
 }
-
 `}</style>
         </>
     );

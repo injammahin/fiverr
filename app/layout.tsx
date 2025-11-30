@@ -8,7 +8,7 @@ import MainNavbar from "./components/MainNavbar";
 import { usePathname } from "next/navigation";
 import Loader from './components/Loader';
 import { useEffect, useState } from 'react';
-
+import ToastProvider from "./components/ToastProvider";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname(); 
   const [loading, setLoading] = useState(true);
@@ -33,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="container px-0">
               <LogoHeader />
               <MainNavbar />
+              <ToastProvider />
               {children}
             </div>
           </>
