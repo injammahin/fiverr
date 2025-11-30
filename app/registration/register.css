@@ -1,0 +1,158 @@
+.reg-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.reg-box {
+  width: 900px;
+  background: white;
+  padding: 40px 60px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.reg-logo {
+  display: block;
+  margin: 0 auto 20px;
+  width: 100px;
+}
+
+.reg-title {
+  text-align: center;
+  font-size: 34px;
+  margin-bottom: 10px;
+}
+
+.reg-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.reg-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.reg-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  grid-column: span 2;
+}
+
+.reg-input-wrapper input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.reg-dropdown label,
+.reg-input-wrapper label {
+  margin-bottom: 5px;
+  font-size: 15px;
+}
+
+.reg-dropdown {
+  position: relative;
+}
+
+.reg-dd-btn {
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #1583e9;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reg-dd-menu {
+  position: absolute;
+  background: white;
+  width: 100%;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: 1px solid #d0d0d0;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.reg-dd-item {
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.reg-dd-item:hover {
+  background: #e9f5ff;
+}
+
+.arrow {
+  border: solid #444;
+  border-width: 0 2px 2px 0;
+  padding: 4px;
+  transform: rotate(45deg);
+  margin-left: 10px;
+}
+
+.reg-pass {
+  position: relative;
+}
+
+.reg-pass input {
+  width: 100%;
+  padding: 12px 40px 12px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.eye {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.reg-buttons {
+  grid-column: span 2;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.start-btn {
+  background: #0083ff;
+  color: white;
+  padding: 10px 28px;
+  border-radius: 6px;
+  border: none;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: none;
+  color: #666;
+}
+
+.reg-privacy {
+  grid-column: span 2;
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+  font-size: 13px;
+  color: #666;
+  gap: 8px;
+}
+.invalid {
+  border-color: #d9534f !important;
+}
+
+.error-text {
+  font-size: 13px;
+  color: #d9534f;
+  margin-top: 4px;
+}

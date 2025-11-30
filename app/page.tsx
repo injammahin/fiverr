@@ -12,6 +12,15 @@ export default function Home() {
           ALUXO <span className="font-light">BY ANNUNZIATA TREUHAND</span>
         </h1>
 
+            {/* LOGIN BUTTON */}
+            <div className="d-flex gap-2">
+        <Link
+          href="/registration"
+          className="px-8 py-3 bg-[#fff] text-[#0f3a4f] rounded-md font-medium shadow-lg hover:bg-[#fff] transition-all duration-300 ease-in-out transform hover:scale-105"
+        >
+          register
+        </Link>
+
         {/* LOGIN BUTTON */}
         <Link
           href="/login"
@@ -19,6 +28,7 @@ export default function Home() {
         >
           Login
         </Link>
+        </div>
       </header>
 
       {/* MAIN CONTENT */}
