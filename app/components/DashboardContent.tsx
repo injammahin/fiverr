@@ -208,7 +208,7 @@ export default function DashboardContent() {
                 }
 
                 .bexio-link {
-                    color: #009edc;
+                    color: #e18108;
                     text-decoration: none;
                     cursor: pointer;
                 }
@@ -305,7 +305,7 @@ export default function DashboardContent() {
                 }
 
                 .bexio-link {
-                    color: #0d89ca;
+                    color: #e18108;
                     font-size: 14px;
                     cursor: pointer;
                 }
