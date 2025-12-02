@@ -1,59 +1,145 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import OrderTabs from "./components/OrderTabs";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "@/app/config/api";
+import toast from "react-hot-toast";
+import NewInvoiceModal from "./new/page";
+
+type OrderType = {
+  id: number;
+  date: string;
+  order_number: string;
+  status: string;
+  title?: string;
+  currency: string;
+  net_total?: number;
+  gross_total?: number;
+  contract?: { name: string };
+};
 
 export default function OrdersPage() {
+  const [orders, setOrders] = useState<OrderType[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [openMenu, setOpenMenu] = useState<number | null>(null);
 
-  const orders = [
-    { date: "24.11.2025", no: "AU-00002", status: "Pending", customer: "Test", title: "ALI", currency: "CHF", net: 0.00, gross: 0.00 },
-    // Add more orders here for testing
-  ];
+  const loadOrders = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-  const filteredOrders = orders.filter((order) => 
-    (statusFilter === "All" || order.status === statusFilter) &&
-    (order.no.includes(search) || order.customer.includes(search) || order.title.includes(search))
-  );
+      const data = await res.json();
+      setOrders(data);
+    } catch {
+      toast.error("Unable to load orders");
+    }
+  };
+
+  useEffect(() => {
+    loadOrders();
+
+    // Close action menu on outside click
+    const handleClickOutside = () => setOpenMenu(null);
+    document.addEventListener("click", handleClickOutside);
+
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const filteredOrders = orders.filter((order) => {
+    const matchStatus = statusFilter === "All" || order.status === statusFilter;
+    const matchSearch =
+      order.order_number?.toLowerCase().includes(search.toLowerCase()) ||
+      order.contract?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      order.title?.toLowerCase().includes(search.toLowerCase());
+
+    return matchStatus && matchSearch;
+  });
+
+  const deleteOrder = async () => {
+    if (deleteId === null) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${API_BASE_URL}/orders/${deleteId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) return toast.error(data.message);
+
+      toast.success("Order deleted");
+      setOrders((prev) => prev.filter((o) => o.id !== deleteId));
+      setDeleteId(null);
+    } catch {
+      toast.error("Delete failed");
+    }
+  };
+
+  const downloadPDF = async (id: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE_URL}/orders/${id}/pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) return toast.error("PDF error");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Order-${id}.pdf`;
+      a.click();
+    } catch {
+      toast.error("PDF download failed");
+    }
+  };
 
   return (
     <div className="container-fluid px-4 mt-4">
-        <div className="d-flex justify-content-between align-items-center">
-      <h3 className="mb-3">Orders</h3>
-      {/* New Order Button */}
-      <Link href="./orders/new" className="btn btn-success fw-semibold px-3">
-            New Orders
-          </Link>
-   </div>
-      {/* Filter + Search */}
-      <div className="d-flex justify-content-between align-items-center mt-3 mb-3">
-        <div className="d-flex align-items-center gap-3">
-          <select
-            className="form-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            style={{ width: "200px" }}
-          >
-            <option value="All">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Partial">Partial</option>
-            <option value="Done">Done</option>
-          </select>
-          <button className="btn btn-light">Filter</button>
-        </div>
 
-        <div className="d-flex">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search"
-            style={{ width: "220px" }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+      <div className="d-flex justify-content-between">
+        <h3>Orders</h3>
+
+        <button className="btn btn-success" onClick={() => setShowModal(true)}>
+          New Order
+        </button>
+
+        {showModal && <NewInvoiceModal onClose={() => setShowModal(false)} />}
+      </div>
+
+      {/* Filters */}
+      <div className="d-flex justify-content-between mt-3 mb-3">
+        <select
+          className="form-select"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ width: "200px" }}
+        >
+          <option value="All">All</option>
+          <option value="draft">Draft</option>
+          <option value="pending">Pending</option>
+          <option value="partial">Partial</option>
+          <option value="done">Done</option>
+        </select>
+
+        <input
+          type="text"
+          className="form-control"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search"
+          style={{ width: "220px" }}
+        />
       </div>
 
       {/* Table */}
@@ -70,28 +156,71 @@ export default function OrdersPage() {
                 <th>Currency</th>
                 <th>Net</th>
                 <th>Gross</th>
-                <th>Dispatch</th>
                 <th>Actions</th>
               </tr>
             </thead>
+
             <tbody>
-              {filteredOrders.map((order, index) => (
-                <tr key={index}>
+              {filteredOrders.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="text-center py-4">
+                    No orders found.
+                  </td>
+                </tr>
+              )}
+
+              {filteredOrders.map((order) => (
+                <tr key={order.id}>
                   <td>{order.date}</td>
-                  <td>{order.no}</td>
+                  <td>{order.order_number}</td>
                   <td>{order.status}</td>
-                  <td>{order.customer}</td>
-                  <td>{order.title}</td>
+                  <td>{order.contract?.name ?? "—"}</td>
+                  <td>{order.title ?? "—"}</td>
                   <td>{order.currency}</td>
-                  <td>{order.net}</td>
-                  <td>{order.gross}</td>
-                  <td>
-                    <input type="checkbox" />
+                  <td>{order.net_total ?? 0}</td>
+                  <td>{order.gross_total ?? 0}</td>
+
+                  <td
+                    className="position-relative"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* Trigger */}
+                    <button
+                      className="btn btn-sm btn-light border"
+                      onClick={() =>
+                        setOpenMenu(openMenu === order.id ? null : order.id)
+                      }
+                    >
+                      ⋮
+                    </button>
+
+                    {/* Custom dropdown */}
+                    {openMenu === order.id && (
+                      <div className="dropdown-menu-custom">
+                        <button
+                          className="dropdown-item-custom"
+                          onClick={() => downloadPDF(order.id)}
+                        >
+                          📄 Download PDF
+                        </button>
+
+                        <Link
+                          href={`/sales/orders/${order.id}/edit`}
+                          className="dropdown-item-custom"
+                        >
+                          ✏️ Edit
+                        </Link>
+
+                        <button
+                          className="dropdown-item-custom text-danger"
+                          onClick={() => setDeleteId(order.id)}
+                        >
+                          🗑 Delete
+                        </button>
+                      </div>
+                    )}
                   </td>
-                  <td>
-                    <button className="btn btn-info btn-sm">Edit</button>
-                    <button className="btn btn-danger btn-sm ml-2">Delete</button>
-                  </td>
+
                 </tr>
               ))}
             </tbody>
@@ -99,16 +228,37 @@ export default function OrdersPage() {
         </div>
       </div>
 
-      {/* Page Footer */}
-      <div className="d-flex justify-content-between text-muted small mt-4 px-1">
-        <div>Testfirma<br />Help & Support</div>
-        <div className="text-end">
-          <a href="#" className="text-muted">Facebook</a> |
-          <a href="#" className="text-muted">Blog</a>
-          <br />© bexio ag
-        </div>
-      </div>
+      {/* Delete Modal */}
+      {deleteId !== null && (
+        <div className="modal show d-block" style={{ background: "#0003" }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
 
+              <div className="modal-header">
+                <h5 className="modal-title">Confirm Delete</h5>
+              </div>
+
+              <div className="modal-body">
+                Are you sure you want to delete this order?
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setDeleteId(null)}
+                >
+                  Cancel
+                </button>
+
+                <button className="btn btn-danger" onClick={deleteOrder}>
+                  Delete
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

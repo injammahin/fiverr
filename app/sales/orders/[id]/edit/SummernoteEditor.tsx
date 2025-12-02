@@ -1,35 +1,55 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import "summernote/dist/summernote-lite.css";
 // @ts-ignore
 import $ from "jquery";
 import "summernote/dist/summernote-lite.js";
-import "summernote/dist/summernote-lite.css";
 
-export default function SummernoteEditor() {
-  const editorRef = useRef<HTMLDivElement>(null);
+export default function SummernoteEditor({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const editorRef = useRef<any>(null);
+  const ignoreUpdate = useRef(false); // 👈 prevent mirroring
 
   useEffect(() => {
     if (!editorRef.current) return;
 
-    // Initialize Summernote
-    ($(editorRef.current) as any).summernote({
-      height: 200,
+    $(editorRef.current).summernote({
       placeholder: "Write description...",
-      toolbar: [
-        ["style", ["bold", "italic", "underline"]],
-        ["para", ["ul", "ol"]],
-        ["insert", ["link"]],
-        ["misc", ["undo", "redo"]],
-      ],
+      tabsize: 2,
+      height: 180,
+      callbacks: {
+        onChange: function (contents: string) {
+          ignoreUpdate.current = true;    // 👈 this update comes from Summernote
+          onChange && onChange(contents);
+        },
+      },
     });
 
+    $(editorRef.current).summernote("code", value || "");
+
     return () => {
-      try {
-        ($(editorRef.current) as any).summernote("destroy");
-      } catch (e) {}
+      $(editorRef.current).summernote("destroy");
     };
   }, []);
+
+  // Update editor when value changes externally
+  useEffect(() => {
+    // Prevent resetting editor while user types
+    if (ignoreUpdate.current) {
+      ignoreUpdate.current = false;
+      return;
+    }
+
+    if (editorRef.current) {
+      $(editorRef.current).summernote("code", value || "");
+    }
+  }, [value]);
 
   return <div ref={editorRef}></div>;
 }

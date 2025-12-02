@@ -246,3 +246,48 @@ a {
   border-bottom: 3px solid #e18107 !important;
   font-weight: bold;
 }
+
+.dropdown-menu-custom {
+  position: absolute;
+  right: 30px;
+  top: -60px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 0;
+  width: 160px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  z-index: 9999;
+  border: 1px solid #eee;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.dropdown-item-custom {
+  width: 100%;
+  padding: 8px 15px;
+  text-align: left;
+  border: none;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+  display: block;
+}
+
+.dropdown-item-custom:hover {
+  background: #f7f7f7;
+}
+
+.dropdown-item-custom.text-danger:hover {
+  background: #fff2f2;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,6 +1,102 @@
 "use client";
 
-export default function Settings() {
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "@/app/config/api";
+import toast from "react-hot-toast";
+
+interface SettingsProps {
+  quoteId: string | number;
+}
+
+export default function Settings({ quoteId }: SettingsProps) {
+  const [settings, setSettings] = useState<any>({
+    template: "",
+    language: "",
+    decimals_quantity: 2,
+    decimals_price: 2,
+    show_tax: false,
+    contact_partner: "",
+    seller: "",
+    bank_account: "",
+    currency: "",
+    taxable: "incl",
+    price_type: "net",
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  // ===========================
+  // LOAD SETTINGS FROM BACKEND
+  // ===========================
+  const loadSettings = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${API_BASE_URL}/quotes/${quoteId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (data.settings) {
+        setSettings({
+          template: data.settings.template || "Default template",
+          language: data.settings.language || "English",
+          decimals_quantity: data.settings.decimals_quantity || 2,
+          decimals_price: data.settings.decimals_price || 2,
+          show_tax: !!data.settings.show_tax,
+          contact_partner: data.settings.contact_partner || "",
+          seller: data.settings.seller || "",
+          bank_account: data.settings.bank_account || "Raiffeisen (CHF)",
+          currency: data.settings.currency || "CHF",
+          taxable: data.settings.taxable || "incl",
+          price_type: data.settings.price_type || "net",
+        });
+      }
+    } catch (error) {
+      console.error("Settings load error:", error);
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadSettings();
+  }, [quoteId]);
+
+  // ===========================
+  // SAVE SETTINGS
+  // ===========================
+  const saveSettings = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${API_BASE_URL}/quotes/${quoteId}/settings`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+        body: JSON.stringify(settings),
+      });
+
+      if (!res.ok) return toast.error("Failed to save settings");
+
+      toast.success("Settings saved!");
+    } catch {
+      toast.error("Network error");
+    }
+  };
+
+  if (loading) return <div className="p-3">Loading settings…</div>;
+
+  // ===========================
+  // RENDER
+  // ===========================
   return (
     <div className="editor-section">
 
@@ -10,37 +106,65 @@ export default function Settings() {
         <div className="col">
 
           <label className="form-label">Template *</label>
-          <select className="form-select mb-3">
+          <select
+            className="form-select mb-3"
+            value={settings.template}
+            onChange={(e) => setSettings({ ...settings, template: e.target.value })}
+          >
             <option>Default template</option>
           </select>
 
           <label className="form-label">Language *</label>
-          <select className="form-select mb-3">
+          <select
+            className="form-select mb-3"
+            value={settings.language}
+            onChange={(e) => setSettings({ ...settings, language: e.target.value })}
+          >
             <option>Chinese</option>
             <option>English</option>
             <option>German</option>
           </select>
 
           <label className="form-label">Number of decimal places for quantities *</label>
-          <select className="form-select mb-3">
+          <select
+            className="form-select mb-3"
+            value={settings.decimals_quantity}
+            onChange={(e) =>
+              setSettings({ ...settings, decimals_quantity: Number(e.target.value) })
+            }
+          >
             <option>2</option>
           </select>
 
-          <label className="form-label">
-            Number of decimal places for prices *
-          </label>
-          <select className="form-select mb-3">
+          <label className="form-label">Number of decimal places for prices *</label>
+          <select
+            className="form-select mb-3"
+            value={settings.decimals_price}
+            onChange={(e) =>
+              setSettings({ ...settings, decimals_price: Number(e.target.value) })
+            }
+          >
             <option>2</option>
           </select>
 
           <div className="form-check mt-3 mb-3">
-            <input type="checkbox" className="form-check-input" id="showTax" />
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="showTax"
+              checked={settings.show_tax}
+              onChange={(e) =>
+                setSettings({ ...settings, show_tax: e.target.checked })
+              }
+            />
             <label className="form-check-label" htmlFor="showTax">
               Show tax for each item
             </label>
           </div>
 
-          <button className="btn btn-primary mt-3">Apply settings</button>
+          <button className="btn btn-primary mt-3" onClick={saveSettings}>
+            Apply settings
+          </button>
 
         </div>
 
@@ -48,36 +172,103 @@ export default function Settings() {
         <div className="col">
 
           <label className="form-label">Contact partner *</label>
-          <select className="form-select mb-3">
+          <select
+            className="form-select mb-3"
+            value={settings.contact_partner}
+            onChange={(e) =>
+              setSettings({ ...settings, contact_partner: e.target.value })
+            }
+          >
             <option>Test Test</option>
           </select>
 
           <label className="form-label">Seller</label>
-          <select className="form-select mb-3">
+          <select
+            className="form-select mb-3"
+            value={settings.seller}
+            onChange={(e) =>
+              setSettings({ ...settings, seller: e.target.value })
+            }
+          >
             <option></option>
           </select>
 
           <label className="form-label">Bank account *</label>
-          <select className="form-select mb-3">
+          <select
+            className="form-select mb-3"
+            value={settings.bank_account}
+            onChange={(e) =>
+              setSettings({ ...settings, bank_account: e.target.value })
+            }
+          >
             <option>Raiffeisen (CHF)</option>
           </select>
 
           <label className="form-label">Currency *</label>
-          <select className="form-select mb-3">
+          <select
+            className="form-select mb-3"
+            value={settings.currency}
+            onChange={(e) =>
+              setSettings({ ...settings, currency: e.target.value })
+            }
+          >
             <option>CHF</option>
           </select>
 
           <label className="form-label d-block">Taxable *</label>
           <div className="d-flex gap-4 mb-3">
-            <div><input type="radio" name="tax" defaultChecked /> Incl. tax</div>
-            <div><input type="radio" name="tax" /> Excl. tax</div>
-            <div><input type="radio" name="tax" /> Tax exempt</div>
+            <div>
+              <input
+                type="radio"
+                name="tax"
+                checked={settings.taxable === "incl"}
+                onChange={() => setSettings({ ...settings, taxable: "incl" })}
+              />{" "}
+              Incl. tax
+            </div>
+
+            <div>
+              <input
+                type="radio"
+                name="tax"
+                checked={settings.taxable === "excl"}
+                onChange={() => setSettings({ ...settings, taxable: "excl" })}
+              />{" "}
+              Excl. tax
+            </div>
+
+            <div>
+              <input
+                type="radio"
+                name="tax"
+                checked={settings.taxable === "exempt"}
+                onChange={() => setSettings({ ...settings, taxable: "exempt" })}
+              />{" "}
+              Tax exempt
+            </div>
           </div>
 
           <label className="form-label d-block">Prices</label>
           <div className="d-flex gap-4">
-            <div><input type="radio" name="priceType" /> Gross</div>
-            <div><input type="radio" name="priceType" defaultChecked /> Net</div>
+            <div>
+              <input
+                type="radio"
+                name="priceType"
+                checked={settings.price_type === "gross"}
+                onChange={() => setSettings({ ...settings, price_type: "gross" })}
+              />{" "}
+              Gross
+            </div>
+
+            <div>
+              <input
+                type="radio"
+                name="priceType"
+                checked={settings.price_type === "net"}
+                onChange={() => setSettings({ ...settings, price_type: "net" })}
+              />{" "}
+              Net
+            </div>
           </div>
 
         </div>

@@ -20,18 +20,13 @@ export default function LogoHeader() {
                 return;
             }
 
-            console.log("🔵 Fetching user from:", `${API_BASE_URL}/user`);
-
             const res = await fetch(`${API_BASE_URL}/user`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                credentials: "include",
             });
-
-            console.log("🟢 API status:", res.status);
 
             if (!res.ok) {
                 console.log("❌ User fetch failed:", res.status);
@@ -39,17 +34,18 @@ export default function LogoHeader() {
             }
 
             const data = await res.json();
-            console.log("✅ User data:", data);
+            console.log("🔥 USER RESPONSE:", data);
 
-            const name =
-                data.username ??
-                (data.company ? data.company.split(" ")[0] : "User");
+            // FIXED — Laravel returns user object directly
+            const name = data.username || data.company || "User";
 
             setUserName(name);
+
         } catch (error) {
             console.log("🔥 User fetch error:", error);
         }
     };
+
 
     // ----------------------------------------------------
     // LOGOUT
@@ -57,18 +53,30 @@ export default function LogoHeader() {
     const logout = async () => {
         try {
             const token = localStorage.getItem("token");
-            if (!token) return;
 
-            console.log("🔵 Logging out:", `${API_BASE_URL}/logout`);
+            // Call backend logout (optional)
+            if (token) {
+                await fetch(`${API_BASE_URL}/logout`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+            }
 
-            await fetch(`${API_BASE_URL}/logout`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
+            // ---------------------------------------
+            // ✅ Remove LOCALSTORAGE token
+            // ---------------------------------------
             localStorage.removeItem("token");
+
+            // ---------------------------------------
+            // ✅ Remove COOKIE token (the one middleware reads)
+            // ---------------------------------------
+            document.cookie = "token=; path=/; max-age=0; SameSite=Lax;";
+
+            console.log("✅ Token removed from cookie & localStorage");
+
+            // Redirect to login
             window.location.href = "/login";
         } catch (error) {
             console.log("Logout error:", error);

@@ -6,14 +6,24 @@ import $ from "jquery";
 import "summernote/dist/summernote-lite.js";
 import "summernote/dist/summernote-lite.css";
 
-export default function SummernoteEditor() {
+interface EditorProps {
+  initialValue?: string;
+  onChange?: (value: string) => void;
+}
+
+export default function SummernoteEditor({
+  initialValue = "",
+  onChange = () => { },
+}: EditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!editorRef.current) return;
 
+    const $el = $(editorRef.current) as any;
+
     // Initialize Summernote
-    ($(editorRef.current) as any).summernote({
+    $el.summernote({
       height: 200,
       placeholder: "Write description...",
       toolbar: [
@@ -22,12 +32,20 @@ export default function SummernoteEditor() {
         ["insert", ["link"]],
         ["misc", ["undo", "redo"]],
       ],
+      callbacks: {
+        onChange: function (contents: string) {
+          onChange(contents);
+        },
+      },
     });
+
+    // Set initial value
+    $el.summernote("code", initialValue);
 
     return () => {
       try {
-        ($(editorRef.current) as any).summernote("destroy");
-      } catch (e) {}
+        $el.summernote("destroy");
+      } catch { }
     };
   }, []);
 

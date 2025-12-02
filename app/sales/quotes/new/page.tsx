@@ -1,84 +1,135 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { API_BASE_URL } from "@/app/config/api";
+import toast from "react-hot-toast";
 
-export default function NewInvoiceModal() {
+export default function NewInvoiceModal({ onClose }: { onClose: () => void }) {
   const router = useRouter();
 
-  const [contact, setContact] = useState("");
+  const [contracts, setContracts] = useState<any[]>([]);
+  const [selectedContract, setSelectedContract] = useState("");
+  const [title, setTitle] = useState("");
+  const [currency, setCurrency] = useState("CHF");
+  const [date, setDate] = useState("2025-11-26");
+  const [loading, setLoading] = useState(false);
 
-  const goNext = () => {
-    // Fake new invoice ID: RE-00001
-    router.push("/sales/quotes/RE-00001/edit");
+  // 1️⃣ LOAD CONTRACTS (ONLY UNARCHIVED)
+  const loadContracts = async () => {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${API_BASE_URL}/contracts/unarchived`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    const data = await res.json();
+    setContracts(data);
+  };
+
+  useEffect(() => {
+    loadContracts();
+  }, []);
+
+  // 2️⃣ CREATE QUOTE
+  const goNext = async () => {
+    if (!selectedContract) return toast.error("Select a contract");
+
+    const token = localStorage.getItem("token");
+    setLoading(true);
+
+    const res = await fetch(`${API_BASE_URL}/quotes/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        contract_id: selectedContract,
+        title,
+        currency,
+        date,
+      }),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (!res.ok) return toast.error(data.message || "Failed to create quote");
+
+    // 3️⃣ REDIRECT WITH NEW QUOTE ID
+    router.push(`/sales/quotes/${data.quote.id}/edit`);
   };
 
   return (
     <>
-      {/* Overlay */}
-      <div className="modal-backdrop fade show"></div>
+      <div className="modal-backdrop fade show" onClick={onClose}></div>
 
-      {/* Modal */}
-      <div className="modal d-block" tabIndex={-1}>
+      <div className="modal d-block">
         <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content shadow">
+          <div className="modal-content">
 
-            {/* Header */}
             <div className="modal-header">
-              <h5 className="modal-title fw-semibold">New invoice</h5>
-              <button className="btn-close"></button>
+              <h5 className="modal-title">New Contract</h5>
+              <button className="btn-close" onClick={onClose}></button>
             </div>
 
-            {/* Body */}
             <div className="modal-body">
+              <label className="form-label fw-semibold">Contract *</label>
 
-              {/* Contact */}
-              <label className="form-label fw-semibold">Contact *</label>
-              <div className="input-group mb-3">
-                <input
-                  className="form-control"
-                  placeholder="Please enter a search term."
-                  value={contact}
-                  onChange={e => setContact(e.target.value)}
-                />
-                <span className="input-group-text">📇</span>
-              </div>
+              <select
+                className="form-select mb-3"
+                value={selectedContract}
+                onChange={(e) => setSelectedContract(e.target.value)}
+              >
+                <option value="">Select a contract…</option>
 
-              <label className="form-label">Contact person</label>
-              <select className="form-select mb-3">
-                <option>Select…</option>
-              </select>
-
-              <label className="form-label">Project</label>
-              <select className="form-select mb-3">
-                <option>Select…</option>
+                {contracts.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.business_name || c.last_name}
+                  </option>
+                ))}
               </select>
 
               <label className="form-label">Title</label>
-              <input className="form-control mb-3" />
+              <input
+                className="form-control mb-3"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
 
               <div className="row">
                 <div className="col">
-                  <label className="form-label">Date *</label>
-                  <div className="input-group">
-                    <input className="form-control" value="26.11.2025" readOnly/>
-                    <span className="input-group-text">📅</span>
-                  </div>
+                  <label>Date *</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
                 </div>
 
                 <div className="col">
-                  <label className="form-label">Currency *</label>
-                  <select className="form-select">
+                  <label>Currency *</label>
+                  <select
+                    className="form-select"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                  >
                     <option>CHF</option>
+                    <option>EUR</option>
+                    <option>USD</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Footer */}
             <div className="modal-footer">
-              <button className="btn btn-primary px-4" onClick={goNext}>
-                Next →
+              <button className="btn btn-primary" onClick={goNext} disabled={loading}>
+                {loading ? "Please wait…" : "Next →"}
               </button>
             </div>
 

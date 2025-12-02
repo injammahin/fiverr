@@ -1,33 +1,75 @@
-"use client"; 
+"use client";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import TopBar from "./components/TopBar";
 import LogoHeader from "./components/LogoHeader";
 import MainNavbar from "./components/MainNavbar";
+
 import { usePathname } from "next/navigation";
-import Loader from './components/Loader';
-import { useEffect, useState } from 'react';
+import Loader from "./components/Loader";
+import { useEffect, useState } from "react";
 import ToastProvider from "./components/ToastProvider";
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname(); 
+
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export default function RootLayout({ children }: LayoutProps) {
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
 
-  const isExcludedPage = pathname === "/" || pathname === "/login" ||  pathname.startsWith("/cockpit") ||  pathname.startsWith("/registration");
+  // ---------------------------------------------
+  // READ TOKEN (cookie first, localStorage next)
+  // ---------------------------------------------
+  const getToken = () => {
+    if (typeof window === "undefined") return null;
 
+    const cookieToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1];
+
+    if (cookieToken) return cookieToken;
+
+    return localStorage.getItem("token");
+  };
+
+  // ---------------------------------------------
+  // AUTH GUARD
+  // ---------------------------------------------
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
+    const publicRoutes = ["/", "/login", "/registration"];
+    const isPublic =
+      publicRoutes.includes(pathname) ||
+      pathname.startsWith("/cockpit");
 
+    if (!isPublic) {
+      const token = getToken();
+      if (!token) {
+        window.location.href = "/login";
+      }
+    }
+
+    const timer = setTimeout(() => setLoading(false), 600);
     return () => clearTimeout(timer);
-  }, []);
+  }, [pathname]);
+
+  // ---------------------------------------------
+  // Hide layout on login/registration pages
+  // ---------------------------------------------
+  const hideLayout =
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname.startsWith("/cockpit") ||
+    pathname.startsWith("/registration");
 
   return (
     <html lang="en">
       <body className="bg-light">
         {loading && <Loader />}
-        {!isExcludedPage && (
+
+        {!hideLayout ? (
           <>
             <TopBar />
             <div className="container px-0">
@@ -37,8 +79,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </div>
           </>
+        ) : (
+          children
         )}
-        {isExcludedPage && children}
       </body>
     </html>
   );

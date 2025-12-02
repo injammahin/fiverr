@@ -16,7 +16,7 @@ export default function LoginPage() {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setFormError(""); // clear old error
+        setFormError(""); // clear previous errors
 
         try {
             const res = await fetch(`${API_BASE_URL}/login`, {
@@ -52,7 +52,7 @@ export default function LoginPage() {
             }
 
             // --------------------------------------------
-            // ❌ Case 3: Unexpected Response
+            // ❌ Case 3: Unexpected Response (no token)
             // --------------------------------------------
             if (!res.ok || !result.token) {
                 setFormError(result.message || "Login failed");
@@ -62,11 +62,17 @@ export default function LoginPage() {
             }
 
             // --------------------------------------------
-            // ✅ SUCCESS: Save Token
+            // ✅ SUCCESS: Save Token (localStorage + Cookie)
             // --------------------------------------------
             localStorage.setItem("token", result.token);
+
+            // Save token to cookie (7 days)
+            document.cookie = `token=${result.token}; path=/; max-age=${7 * 24 * 60 * 60
+                }; samesite=lax`;
+
             toast.success("Login successful!");
 
+            // Redirect after delay
             setTimeout(() => {
                 router.push("/dashboard");
             }, 600);
