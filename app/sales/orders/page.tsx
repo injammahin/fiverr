@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { API_BASE_URL } from "@/app/config/api";
 import toast from "react-hot-toast";
 import NewInvoiceModal from "./new/page";
-
 type OrderType = {
   id: number;
   date: string;
@@ -29,6 +28,7 @@ export default function OrdersPage() {
   const loadOrders = async () => {
     try {
       const token = localStorage.getItem("token");
+
       const res = await fetch(`${API_BASE_URL}/orders`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -42,12 +42,6 @@ export default function OrdersPage() {
 
   useEffect(() => {
     loadOrders();
-
-    // Close action menu on outside click
-    const handleClickOutside = () => setOpenMenu(null);
-    document.addEventListener("click", handleClickOutside);
-
-    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   const filteredOrders = orders.filter((order) => {
@@ -109,15 +103,19 @@ export default function OrdersPage() {
 
       <div className="d-flex justify-content-between">
         <h3>Orders</h3>
-
-        <button className="btn btn-success" onClick={() => setShowModal(true)}>
+        <button
+          className="btn btn-success"
+          onClick={() => setShowModal(true)}
+        >
           New Order
         </button>
 
-        {showModal && <NewInvoiceModal onClose={() => setShowModal(false)} />}
+        {showModal && (
+          <NewInvoiceModal onClose={() => setShowModal(false)} />
+        )}
       </div>
 
-      {/* Filters */}
+      {/* Filter + Search */}
       <div className="d-flex justify-content-between mt-3 mb-3">
         <select
           className="form-select"
@@ -180,55 +178,50 @@ export default function OrdersPage() {
                   <td>{order.net_total ?? 0}</td>
                   <td>{order.gross_total ?? 0}</td>
 
-                  <td
-                    className="position-relative"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {/* Trigger */}
-                    <button
-                      className="btn btn-sm btn-light border"
-                      onClick={() =>
-                        setOpenMenu(openMenu === order.id ? null : order.id)
-                      }
+                  <td className="d-flex gap-2">
+
+                    {/* Edit */}
+                    <Link
+                      href={`/sales/orders/${order.id}/edit`}
+                      className="text-primary"
+                      title="Edit"
                     >
-                      ⋮
+                      ✏️
+                    </Link>
+
+                    {/* Download PDF */}
+                    <button
+                      className="btn p-0 text-danger"
+                      onClick={() => downloadPDF(order.id)}
+                      title="Download PDF"
+                      style={{ background: "transparent", border: "none" }}
+                    >
+                      📄
                     </button>
 
-                    {/* Custom dropdown */}
-                    {openMenu === order.id && (
-                      <div className="dropdown-menu-custom">
-                        <button
-                          className="dropdown-item-custom"
-                          onClick={() => downloadPDF(order.id)}
-                        >
-                          📄 Download PDF
-                        </button>
+                    {/* Delete */}
+                    <button
+                      className="btn p-0 text-danger"
+                      onClick={() => setDeleteId(order.id)}
+                      title="Delete"
+                      style={{ background: "transparent", border: "none" }}
+                    >
+                      🗑️
+                    </button>
 
-                        <Link
-                          href={`/sales/orders/${order.id}/edit`}
-                          className="dropdown-item-custom"
-                        >
-                          ✏️ Edit
-                        </Link>
-
-                        <button
-                          className="dropdown-item-custom text-danger"
-                          onClick={() => setDeleteId(order.id)}
-                        >
-                          🗑 Delete
-                        </button>
-                      </div>
-                    )}
                   </td>
+
+
 
                 </tr>
               ))}
             </tbody>
+
           </table>
         </div>
       </div>
 
-      {/* Delete Modal */}
+      {/* Delete modal */}
       {deleteId !== null && (
         <div className="modal show d-block" style={{ background: "#0003" }}>
           <div className="modal-dialog">

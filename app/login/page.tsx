@@ -8,80 +8,76 @@ import toast from "react-hot-toast";
 export default function LoginPage() {
     const router = useRouter();
 
-    const [email, setEmail] = useState("");
+    const [loginValue, setLoginValue] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [formError, setFormError] = useState(""); // text shown under inputs
+    const [formError, setFormError] = useState("");
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setFormError(""); // clear previous errors
+        setFormError("");
 
         try {
             const res = await fetch(`${API_BASE_URL}/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ login: loginValue, password }),
             });
 
             const result = await res.json();
 
-            // --------------------------------------------
-            // ❌ Case 1: Laravel Validation Errors
-            // --------------------------------------------
-            if (res.status === 422) {
-                const firstError = Object.values(result.errors)[0] as string[];
-                const message = firstError ? firstError[0] : "Validation error";
-                setFormError(message);
-                toast.error(message);
-                setLoading(false);
-                return;
-            }
-
-            // --------------------------------------------
-            // ❌ Case 2: Wrong Credentials
-            // --------------------------------------------
-            if (res.status === 401) {
-                setFormError("Invalid email or password");
-                toast.error("Invalid email or password");
-                setLoading(false);
-                return;
-            }
-
-            // --------------------------------------------
-            // ❌ Case 3: Unexpected Response (no token)
-            // --------------------------------------------
-            if (!res.ok || !result.token) {
-                setFormError(result.message || "Login failed");
+            if (!res.ok) {
                 toast.error(result.message || "Login failed");
+                setFormError(result.message);
                 setLoading(false);
                 return;
             }
 
-            // --------------------------------------------
-            // ✅ SUCCESS: Save Token (localStorage + Cookie)
-            // --------------------------------------------
+            // -------------------------------
+            // SAVE LOGIN SESSION
+            // -------------------------------
             localStorage.setItem("token", result.token);
+            localStorage.setItem("role", result.role);
+            localStorage.setItem("user", JSON.stringify(result.user));
+            localStorage.setItem("tenants", JSON.stringify(result.tenants));
+            if (result.user?.tenant_id) {
+                localStorage.setItem("tenant_id", result.user.tenant_id);
+            }
 
-            // Save token to cookie (7 days)
-            document.cookie = `token=${result.token}; path=/; max-age=${7 * 24 * 60 * 60
-                }; samesite=lax`;
+            // Cookie for middleware
+            document.cookie = `token=${result.token}; Path=/; Max-Age=${7 * 86400}; SameSite=None; Secure`;
 
             toast.success("Login successful!");
 
-            // Redirect after delay
-            setTimeout(() => {
-                router.push("/dashboard");
-            }, 600);
+            // -------------------------------
+            // ROLE-BASED REDIRECTS
+            // -------------------------------
+            if (result.role === "employee") {
+                const assignedTenant = result.tenants[0];
+                localStorage.setItem("tenant_id", assignedTenant.id);
+            }
 
-        } catch (error) {
-            // --------------------------------------------
-            // ❌ Case 4: Server Not Responding
-            // --------------------------------------------
-            console.error("Login error:", error);
+            let redirect = "/dashboard";
+
+            if (result.role === "admin") redirect = "/admin";
+            else if (result.role === "employee") redirect = "/employee/dashboard";
+
+            else if (["boss", "accountant", "assistant"].includes(result.role)) {
+                const tenantId = result.user.tenant_id;
+                redirect = `/dashboard/${tenantId}`;
+            }
+
+            else if (result.role === "tenant-admin") {
+                const tenant = result.tenants[0];
+                redirect = `/tenant/${tenant.id}`;
+            }
+
+            setTimeout(() => {
+                router.push(redirect);
+            }, 200);
+
+        } catch (err) {
             toast.error("Server not responding");
             setFormError("Server not responding");
         }
@@ -91,54 +87,33 @@ export default function LoginPage() {
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-            <div className="card shadow p-4" style={{ width: "400px" }}>
-
-                <h2 className="text-center fw-bold mb-3" style={{ fontSize: "26px" }}>
-                    ALUXO <span className="fw-light">BY ANNUNZIATA TREUHAND</span>
-                </h2>
+            <div className="card shadow p-4" style={{ width: 400 }}>
+                <h2 className="text-center fw-bold mb-3">ALUXO Login</h2>
 
                 <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label className="form-label fw-semibold">Email address</label>
-                        <input
-                            type="email"
-                            className={`form-control ${formError ? "is-invalid" : ""}`}
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <label className="form-label">Email or Username</label>
+                    <input
+                        className="form-control mb-2"
+                        value={loginValue}
+                        onChange={(e) => setLoginValue(e.target.value)}
+                        required
+                    />
 
-                    <div className="mb-3">
-                        <label className="form-label fw-semibold">Password</label>
-                        <input
-                            type="password"
-                            className={`form-control ${formError ? "is-invalid" : ""}`}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <label className="form-label">Password</label>
+                    <input
+                        type="password"
+                        className="form-control mb-2"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
 
-                    {/* ERROR MESSAGE */}
-                    {formError && (
-                        <p className="text-danger small mb-3">{formError}</p>
-                    )}
+                    {formError && <p className="text-danger small">{formError}</p>}
 
-                    <button
-                        type="submit"
-                        className="btn btn-success w-100 py-2"
-                        disabled={loading}
-                    >
+                    <button type="submit" className="btn btn-success w-100" disabled={loading}>
                         {loading ? "Logging in..." : "Login"}
                     </button>
                 </form>
-
-                <div className="text-center mt-3">
-                    <a href="#" className="text-primary">
-                        Forgot password?
-                    </a>
-                </div>
             </div>
         </div>
     );

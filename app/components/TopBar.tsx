@@ -1,23 +1,23 @@
+// components/TopBar.tsx
 "use client";
-
-import { createContext, useContext } from "react";
-import { Toaster, toast } from "react-hot-toast";
-
-const ToastContext = createContext({
-    showSuccess: (msg: string) => { },
-    showError: (msg: string) => { },
-});
-
-export default function ToastProvider({ children }: any) {
-    const showSuccess = (msg: string) => toast.success(msg);
-    const showError = (msg: string) => toast.error(msg);
-
+import { Home, Search, ChevronLeft,ChevronDown } from "lucide-react";
+export default function TopBar() {
     return (
-        <ToastContext.Provider value={{ showSuccess, showError }}>
-            <Toaster position="top-right" />
-            {children}
-        </ToastContext.Provider>
+        <div className="top-bar py-2 px-3 ">
+            <div className="container d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="/cockpit" target="_blank" className="text-white  d-flex align-items-center">
+                       <ChevronLeft size={14} /> To Cockpit
+                    </a>
+                </div>
+                <div>Accountant access: Testfirma</div>
+                <div>
+                    <a href="#" className="text-white d-flex justify-content-between align-items-center">
+                        Switch companies <ChevronDown size={14} />
+
+                    </a>
+                </div>
+            </div>
+        </div>
     );
 }
-
-export const useToast = () => useContext(ToastContext);

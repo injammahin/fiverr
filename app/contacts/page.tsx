@@ -11,17 +11,28 @@ export default function ContactsPage() {
   const [openMenu, setOpenMenu] = useState<number | null>(null);
   const [tab, setTab] = useState<"all" | "archived">("all");
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const role = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+  const tenantId = typeof window !== "undefined" ? localStorage.getItem("tenant_id") : null;
+
   const toggleMenu = (id: number) => {
     setOpenMenu(openMenu === id ? null : id);
   };
 
-  // Fetch contacts
+  // Fetch contacts based on role
   const getContacts = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+      let url = "";
 
-      const res = await fetch(`${API_BASE_URL}/contacts`, {
+      if (role === "admin") {
+        // Admin sees ALL contacts
+        url = `${API_BASE_URL}/contacts`;
+      } else {
+        // Employee, tenant-admin, boss, assistant → Tenant-specific contacts
+        url = `${API_BASE_URL}/tenant/${tenantId}/contacts`;
+      }
+
+      const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
@@ -31,7 +42,7 @@ export default function ContactsPage() {
       const data = await res.json();
       setContacts(data);
     } catch (err) {
-      console.log("Fetch contacts error:", err);
+      toast.error("Unable to load contacts");
     }
 
     setLoading(false);
@@ -41,69 +52,61 @@ export default function ContactsPage() {
     getContacts();
   }, []);
 
-  // Archive contact
+  // Archive
   const archiveContact = async (id: number) => {
-    const token = localStorage.getItem("token");
-
     try {
-      const res = await fetch(`${API_BASE_URL}/contacts/${id}/archive`, {
+      const res = await fetch(`${API_BASE_URL}/tenant/${tenantId}/contacts/${id}/archive`, {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) return toast.error("Failed to archive");
+      if (!res.ok) return toast.error("Archive failed");
 
-      toast.success("Archived successfully");
+      toast.success("Archived");
       getContacts();
       setOpenMenu(null);
     } catch {
-      toast.error("Error archiving contact");
+      toast.error("Error");
     }
   };
 
-  // Unarchive contact
+  // Unarchive
   const unarchiveContact = async (id: number) => {
-    const token = localStorage.getItem("token");
-
     try {
-      const res = await fetch(`${API_BASE_URL}/contacts/${id}/unarchive`, {
+      const res = await fetch(`${API_BASE_URL}/tenant/${tenantId}/contacts/${id}/unarchive`, {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) return toast.error("Failed to unarchive");
+      if (!res.ok) return toast.error("Unarchive failed");
 
-      toast.success("Unarchived successfully");
+      toast.success("Restored");
       getContacts();
       setOpenMenu(null);
     } catch {
-      toast.error("Error unarchiving contact");
+      toast.error("Error");
     }
   };
 
-  // FIXED FILTER
   const filtered = contacts.filter((c) =>
     tab === "archived"
-      ? c.archived === 1 || c.archived === true
-      : c.archived === 0 || c.archived === false
+      ? c.archived === true || c.archived === 1
+      : c.archived === false || c.archived === 0
   );
 
-  if (loading) return <div className="p-5 text-center">Loading contacts...</div>;
+  if (loading) return <p className="p-5 text-center">Loading...</p>;
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3>Contacts</h3>
 
-        <Link href="/contacts/add" className="btn btn-success">
-          + New contact
-        </Link>
+        {/* Only admin & tenant-admin can create contacts */}
+        {(role === "admin" || role === "tenant-admin") && (
+          <Link href="/contacts/add" className="btn btn-success">
+            + New contact
+          </Link>
+        )}
       </div>
 
       {/* Tabs */}
@@ -126,13 +129,12 @@ export default function ContactsPage() {
         </li>
       </ul>
 
-      <div className="table-responsive mt-4">
+      {/* TABLE */}
+      <div className="table-responsive">
         <table className="table table-hover align-middle">
           <thead>
             <tr>
-              <th style={{ width: 40 }}>
-                <input type="checkbox" className="form-check-input" />
-              </th>
+              <th></th>
               <th>Type</th>
               <th>Name</th>
               <th>Postcode</th>
@@ -140,14 +142,14 @@ export default function ContactsPage() {
               <th>Country</th>
               <th>Email</th>
               <th>Phone</th>
-              <th style={{ width: 40 }}></th>
+              <th></th>
             </tr>
           </thead>
 
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={9} className="text-center py-4 text-muted">
+                <td colSpan={9} className="text-center text-muted py-4">
                   No contacts found.
                 </td>
               </tr>
@@ -155,83 +157,44 @@ export default function ContactsPage() {
 
             {filtered.map((c) => (
               <tr key={c.id}>
-                <td>
-                  <input type="checkbox" className="form-check-input" />
-                </td>
+                <td><input type="checkbox" /></td>
 
                 <td>{c.type === "business" ? "🏢" : "👤"}</td>
-
-                <td>{c.business_name || c.last_name}</td>
+                <td>{c.business_name || `${c.first_name ?? ""} ${c.last_name ?? ""}`}</td>
                 <td>{c.postcode}</td>
                 <td>{c.city}</td>
                 <td>{c.country}</td>
                 <td>{c.email}</td>
                 <td>{c.phone || c.mobile}</td>
 
-                <td className="position-relative text-end">
-                  <button
-                    type="button"
-                    className="btn btn-light btn-sm"
-                    onClick={() => toggleMenu(c.id)}
-                  >
+                <td className="text-end position-relative">
+                  <button className="btn btn-light btn-sm" onClick={() => toggleMenu(c.id)}>
                     ⋮
                   </button>
 
                   {openMenu === c.id && (
-                    <div
-                      className="position-absolute bg-white border rounded shadow-sm"
-                      style={{
-                        padding: "0px 15px 0px 15px",
-                        right: "33px",
-                        top: "-35px",
-                        width: "150px",
-                        zIndex: 10,
-                      }}
-                    >
-                      <Link
-                        href={`/contacts/view/${c.id}`}
-                        className="dropdown-item py-1"
-                      >
-                        👁 View
-                      </Link>
+                    <div className="position-absolute bg-white shadow border rounded"
+                      style={{ right: "30px", top: "-20px", zIndex: 10, width: "150px" }}>
+                      <Link href={`/contacts/view/${c.id}`} className="dropdown-item py-1">👁 View</Link>
 
-                      <Link
-                        href={`/contacts/edit/${c.id}`}
-                        className="dropdown-item py-1"
-                      >
-                        ✏️ Edit
-                      </Link>
+                      {(role === "admin" || role === "tenant-admin") && (
+                        <Link href={`/contacts/edit/${c.id}`} className="dropdown-item py-1">✏️ Edit</Link>
+                      )}
 
                       {!c.archived ? (
-                        <button
-                          className="dropdown-item text-danger py-1"
-                          onClick={() => archiveContact(c.id)}
-                        >
-                          🗂 Archive
-                        </button>
+                        <button className="dropdown-item text-danger py-1" onClick={() => archiveContact(c.id)}>🗂 Archive</button>
                       ) : (
-                        <button
-                          className="dropdown-item text-success py-1"
-                          onClick={() => unarchiveContact(c.id)}
-                        >
-                          ♻️ Unarchive
-                        </button>
+                        <button className="dropdown-item text-success py-1" onClick={() => unarchiveContact(c.id)}>♻ Restore</button>
                       )}
                     </div>
                   )}
-
                 </td>
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      <style jsx>{`
-        .dropdown-item:hover {
-          background: #f5f6f8;
-        }
-      `}</style>
     </div>
   );
 }

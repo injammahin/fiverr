@@ -1,165 +1,194 @@
 "use client";
-import { HelpCircle, Mail, Monitor, Download } from "lucide-react"
-export default function DashboardContent() {
-    return (
-        <div className="bexio-dashboard container-fluid mt-3">
 
-            <div className="d-flex justify-content-between align-items-center">
-                <h1 className="dashboard-title">Dashboard</h1>
-                <button className="btn btn-outline-secondary btn-xs edit-btn-custom">
-                    Edit dashboard
-                </button>
+import { useEffect, useState } from "react";
+import { API } from "@/app/lib/api";
+import toast from "react-hot-toast";
+import { useParams } from "next/navigation";
+import {
+    HelpCircle,
+    Mail,
+    Monitor,
+    Download,
+    ArrowUpCircle,
+    ArrowDownCircle,
+    CreditCard,
+    Receipt,
+} from "lucide-react";
+
+export default function DashboardContent() {
+    const { tenantId } = useParams() as { tenantId: string };
+
+    const [role, setRole] = useState<string>("");
+    const [permissions, setPermissions] = useState<any>({});
+    const [widgets, setWidgets] = useState<any>({});
+    const [loading, setLoading] = useState(true);
+
+    const loadDashboard = async () => {
+        try {
+            const res = await API.get(`/tenant/${tenantId}/dashboard`);
+            setRole(res.data.user.role);
+            setPermissions(res.data.permissions);
+            setWidgets(res.data.widgets);
+        } catch {
+            toast.error("Failed to load dashboard");
+        }
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        loadDashboard();
+    }, []);
+
+    if (loading) return <p className="text-center mt-5">Loading dashboard...</p>;
+
+    return (
+        <div className="dashboard-page container-fluid mt-3">
+
+            {/* HEADER */}
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h1 className="dashboard-title">Overview</h1>
+                <button className="btn edit-btn-custom">Customize</button>
             </div>
 
-            <div className="row gx-3 gy-3">
+            <div className="row g-4">
 
-                {/* LEFT SECTION */}
+                {/* ========================= LEFT ========================= */}
                 <div className="col-lg-6">
 
                     {/* ACCOUNTANT CARD */}
-                    <div className="bexio-card">
-                        <div className="bexio-card-header">
-                            Accountant
+                    {(role === "accountant" || role === "boss") && (
+                        <div className="dashboard-card fade-in">
+                            <div className="dashboard-card-header">
+                                Accountant Tools
+                            </div>
+                            <div className="dashboard-card-body">
+                                <p className="card-subtitle">Manage your client’s system settings</p>
+
+                                <ul className="styled-list">
+                                    <li>Chart of accounts setup</li>
+                                    <li>VAT configuration</li>
+                                    <li>Bank accounts setup</li>
+                                    <li>Fiscal year adjustments</li>
+                                    <li>Tax rate management</li>
+                                </ul>
+                            </div>
                         </div>
+                    )}
 
-                        <div className="bexio-card-body">
-                            <p className="bexio-section-subtitle">Customize your client's account</p>
+                    {/* ASSISTANT CARD */}
+                    {(role === "assistant" || role === "boss") && (
+                        <div className="dashboard-card fade-in mt-4">
+                            <div className="dashboard-card-header">
+                                Assistant Overview
+                            </div>
+                            <div className="dashboard-card-body">
 
-                            <ul className="bexio-list">
-                                <li><a className="bexio-link">Set up bank accounts</a></li>
-                                <li><a className="bexio-link">Edit tax rates</a></li>
-                                <li><a className="bexio-link">Set up chart of accounts</a></li>
-                                <li><a className="bexio-link">Set up base VAT settings</a></li>
-                                <li><a className="bexio-link">Fiscal year settings</a></li>
+                                <div className="permission-row">
+                                    <strong>Upload receipts:</strong>
+                                    {permissions.upload ? (
+                                        <span className="status-green">Enabled</span>
+                                    ) : (
+                                        <span className="status-red">Disabled</span>
+                                    )}
+                                </div>
+
+                                <div className="permission-row">
+                                    <strong>Approve bookings:</strong>
+                                    {permissions.approve ? (
+                                        <span className="status-green">Enabled</span>
+                                    ) : (
+                                        <span className="status-red">Disabled</span>
+                                    )}
+                                </div>
+
+                            </div>
+                        </div>
+                    )}
+
+                    {/* HELP SECTION */}
+                    <div className="dashboard-card fade-in mt-4">
+                        <div className="dashboard-card-header">Support & Help</div>
+                        <div className="dashboard-card-body">
+                            <ul className="help-list">
+
+                                <li>
+                                    <HelpCircle className="icon-yellow" />
+                                    Help Center
+                                </li>
+
+                                <li>
+                                    <Mail className="icon-yellow" />
+                                    Contact Support
+                                </li>
+
+                                <li>
+                                    <Monitor className="icon-yellow" />
+                                    Join Webinars
+                                </li>
+
+                                <li>
+                                    <Download className="icon-yellow" />
+                                    Download AnyDesk
+                                </li>
+
                             </ul>
                         </div>
                     </div>
 
-                    {/* NEED HELP CARD */}
-                    <div className="bexio-card mt-3">
-                        <div className="bexio-card-header">
-                            Need help?
-                        </div>
-
-                        <div className="bexio-card-body">
-                            <ul className="bexio-list">
-
-                                <li>
-                                    <HelpCircle className="bexio-icon" />
-                                    <a className="bexio-link">Visit our help center</a>
-                                </li>
-
-                                <li>
-                                    <Mail className="bexio-icon" />
-                                    <a className="bexio-link">Contact our Support</a>
-                                </li>
-
-                                <li>
-                                    <Monitor className="bexio-icon" />
-                                    <a className="bexio-link">Watch a live presentation (webinar)</a>
-                                </li>
-
-                                <li>
-                                    <Download className="bexio-icon" />
-                                    <a className="bexio-link">Download AnyDesk</a>
-                                </li>
-
-                            </ul>
-                        </div>
-                    </div>
                 </div>
 
-                {/* RIGHT SECTION */}
+                {/* ========================= RIGHT ========================= */}
                 <div className="col-lg-6">
 
-                    {/* CASH RECEIPTS GRAPH CARD */}
-                    <div className="bexio-card">
-                        <div className="bexio-card-header d-flex justify-content-between align-items-center">
-                            <span>Receipts and withdrawals of cash and cash equivalents</span>
+                    {/* WIDGETS: INCOME + EXPENSE */}
+                    <div className="row g-4">
 
-                            <button className="bexio-date-btn">
-                                01/01/2025 - 31/12/2025 ▾
-                            </button>
-                        </div>
-
-                        <div className="bexio-card-body">
-
-                            <div className="bexio-chart-placeholder">
-                                <div className="text-muted mb-3">
-                                    No data is available during this period.
-                                </div>
-
-                                <div className="mt-4 w-75 mx-auto">
-                                    <div className="d-flex justify-content-between small">
-                                        <span><span className="bexio-dot income"></span>Income</span>
-                                        <span><span className="bexio-dot expense"></span>Expenses</span>
-                                    </div>
-
-                                    <div className="d-flex justify-content-between mt-3 small">
-                                        <span>Total income</span>
-                                        <span className="text-success fw-bold">CHF 0.00</span>
-                                    </div>
-
-                                    <div className="d-flex justify-content-between small">
-                                        <span>Total expenses</span>
-                                        <span className="text-danger fw-bold">CHF 0.00</span>
-                                    </div>
+                        <div className="col-md-6">
+                            <div className="small-widget green-widget fade-in">
+                                <ArrowUpCircle className="widget-icon" />
+                                <div>
+                                    <h5 className="widget-title">Income</h5>
+                                    <p className="widget-value">CHF {widgets.income ?? 0}</p>
                                 </div>
                             </div>
-
                         </div>
+
+                        <div className="col-md-6">
+                            <div className="small-widget red-widget fade-in">
+                                <ArrowDownCircle className="widget-icon" />
+                                <div>
+                                    <h5 className="widget-title">Expenses</h5>
+                                    <p className="widget-value">CHF {widgets.expenses ?? 0}</p>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    {/* CREDITORS CARD */}
-                    <div className="bexio-card mt-3">
-                        <div className="bexio-card-header">
-                            Pending bills (creditors)
+                    {/* RECEIPTS WIDGET */}
+                    <div className="dashboard-card fade-in mt-4">
+                        <div className="dashboard-card-header">
+                            Receipts Overview
                         </div>
 
-                        <div className="bexio-card-body">
-                            <p className="bexio-small-muted">
-                                Total unpaid invoices received: CHF 3,506.00
-                            </p>
-
-                            <div className="bexio-bar creditors"></div>
-
-                            <div className="d-flex justify-content-between mt-3">
-                                <div>
-                                    <div className="bexio-small-muted text-uppercase">Pending</div>
-                                    <div className="text-info fw-bold">CHF 1,457.00</div>
-                                </div>
-
-                                <div className="text-end">
-                                    <div className="bexio-small-muted text-uppercase">Overdue</div>
-                                    <div className="text-warning fw-bold">CHF 2,049.00</div>
-                                </div>
+                        <div className="dashboard-card-body big-stat">
+                            <Receipt className="big-icon" />
+                            <div>
+                                <h4>{widgets.receipts ?? 0} Receipts</h4>
+                                <p className="text-muted">Uploaded this period</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* DEBTORS CARD */}
-                    <div className="bexio-card mt-3">
-                        <div className="bexio-card-header">
-                            Pending invoices (debtors)
-                        </div>
+                    {/* PENDING BILLS */}
+                    <div className="dashboard-card fade-in mt-4">
+                        <div className="dashboard-card-header">Pending Bills</div>
 
-                        <div className="bexio-card-body">
-                            <p className="bexio-small-muted">
-                                Total unpaid invoices sent: CHF 15,324.00
-                            </p>
-
-                            <div className="bexio-bar debtors"></div>
-
-                            <div className="d-flex justify-content-between mt-3">
-                                <div>
-                                    <div className="bexio-small-muted text-uppercase">Pending</div>
-                                    <div className="text-info fw-bold">CHF 4,077.00</div>
-                                </div>
-
-                                <div className="text-end">
-                                    <div className="bexio-small-muted text-uppercase">Overdue</div>
-                                    <div className="text-warning fw-bold">CHF 11,247.00</div>
-                                </div>
+                        <div className="dashboard-card-body big-stat">
+                            <CreditCard className="big-icon" />
+                            <div>
+                                <h4>{widgets.pending_bills ?? 0} Bills</h4>
+                                <p className="text-muted">Awaiting payment</p>
                             </div>
                         </div>
                     </div>
@@ -168,154 +197,134 @@ export default function DashboardContent() {
             </div>
 
             {/* FOOTER */}
-            <div className="bexio-footer mt-4">
+            <div className="footer mt-4">
                 <span>Testfirma</span>
                 <span>© ALUXO BY ANNUNZIATA TREUHAND</span>
             </div>
 
             {/* STYLES */}
             <style jsx global>{`
-                .bexio-page-title {
-                    font-size: 26px;
-                    margin-bottom: 15px;
+                .dashboard-title {
+                    font-size: 30px;
+                    font-weight: 700;
+                    color: #333;
                 }
 
-                .bexio-card {
-                    background: #fff;
-                    border: 1px solid #e4e4e4;
-                    border-radius: 4px;
+                /* BEAUTIFUL SAAS CARDS */
+                .dashboard-card {
+                    background: #ffffff;
+                    border-radius: 12px;
+                    padding: 0;
+                    border: 1px solid #e5e5e5;
+                    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+                    transition: 0.3s ease;
                 }
 
-                .bexio-card-header {
-                    padding: 14px;
+                .dashboard-card:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+                }
+
+                .dashboard-card-header {
+                    padding: 14px 18px;
+                    background: #fafafa;
                     font-size: 16px;
                     font-weight: 600;
-                    background: #fafafa;
-                    border-bottom: 1px solid #e4e4e4;
+                    border-bottom: 1px solid #e5e5e5;
+                    border-radius: 12px 12px 0 0;
                 }
 
-                .bexio-card-body {
-                    padding: 16px;
+                .dashboard-card-body {
+                    padding: 18px;
                 }
 
-                .bexio-section-subtitle {
-                    font-size: 13px;
-                    color: #777;
+                /* LISTS */
+                .styled-list li {
+                    padding: 6px 0;
+                    border-bottom: 1px solid #f2f2f2;
                 }
 
-                .bexio-list li {
-                    margin-bottom: 6px;
+                /* WIDGET BOXES */
+                .small-widget {
+                    border-radius: 12px;
+                    padding: 18px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
                 }
 
-                .bexio-link {
-                    color: #e18108;
-                    text-decoration: none;
+                .green-widget { background: #e7f8ec; }
+                .red-widget { background: #fdeaea; }
+
+                .widget-icon {
+                    width: 36px;
+                    height: 36px;
+                }
+
+                .widget-value {
+                    font-size: 22px;
+                    font-weight: 700;
+                }
+
+                /* BIG STAT */
+                .big-stat {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                }
+
+                .big-icon {
+                    width: 40px;
+                    height: 40px;
+                    color: #f6a800;
+                }
+
+                /* PERMISSIONS */
+                .status-green { color: #32ba7c; font-weight: 600; }
+                .status-red { color: #e63946; font-weight: 600; }
+
+                /* HELP SECTION */
+                .help-list li {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 6px 0;
                     cursor: pointer;
                 }
 
-                .bexio-link:hover {
-                    text-decoration: underline;
-                }
-
-                .bexio-small-muted {
-                    color: #888;
-                    font-size: 12px;
-                }
-
-                .bexio-date-btn {
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    padding: 4px 8px;
-                    background: #fff;
-                    font-size: 12px;
-                }
-
-                .bexio-chart-placeholder {
-                    height: 220px;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex-direction: column;
-                }
-
-                .bexio-dot {
-                    display: inline-block;
-                    width: 12px;
-                    height: 12px;
-                    border-radius: 2px;
-                    margin-right: 6px;
-                }
-
-                .income {
-                    background: #a6ce39;
-                }
-
-                .expense {
-                    background: #e94b3c;
-                }
-
-                .bexio-bar {
-                    height: 20px;
-                    border-radius: 4px;
-                    margin-top: 10px;
-                }
-
-                .creditors {
-                    background: linear-gradient(to right, #82c6f5 40%, #f6c85f 60%);
-                }
-
-                .debtors {
-                    background: linear-gradient(to right, #82c6f5 25%, #f6c85f 75%);
-                }
-
-                .bexio-footer {
-                    font-size: 12px;
-                    color: #888;
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 4px;
-                }
-                   .edit-btn-custom {
-                    border-radius: 4px !important;
-                    height: 22px !important;
-                    padding: 15px 17px !important;
-                    font-size: 12px !important;
-                    line-height: 0px !important;
-                }
-                    .bexio-list {
-                    list-style: none;
-                    padding: 0;
-                    margin: 0;
-                }
-
-                .bexio-list li {
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 8px;
-                }
-
-                .bexio-icon {
+                .icon-yellow {
                     width: 18px;
                     height: 18px;
-                    color: #d7b300; /* bexio yellow */
-                    margin-right: 10px;
-                    flex-shrink: 0;
+                    color: #e6a800;
                 }
 
-                .bexio-link {
-                    color: #e18108;
-                    font-size: 14px;
-                    cursor: pointer;
+                /* ANIMATION */
+                .fade-in {
+                    animation: fadeIn 0.5s ease forwards;
+                    opacity: 0;
                 }
 
-                .bexio-link:hover {
-                    text-decoration: underline;
+                @keyframes fadeIn {
+                    to { opacity: 1; }
+                }
+
+                /* BUTTON */
+                .edit-btn-custom {
+                    background: white;
+                    border: 1px solid #ccc;
+                    padding: 6px 14px;
+                    border-radius: 6px;
+                }
+
+                .footer {
+                    display: flex;
+                    justify-content: space-between;
+                    color: #777;
+                    font-size: 12px;
                 }
 
             `}</style>
-
         </div>
     );
 }

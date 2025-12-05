@@ -1,10 +1,12 @@
 "use client";
-
+import "./fontawesome";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 import TopBar from "./components/TopBar";
 import LogoHeader from "./components/LogoHeader";
 import MainNavbar from "./components/MainNavbar";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import { usePathname } from "next/navigation";
 import Loader from "./components/Loader";
@@ -62,6 +64,9 @@ export default function RootLayout({ children }: LayoutProps) {
     pathname === "/" ||
     pathname === "/login" ||
     pathname.startsWith("/cockpit") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/employee") ||
+    pathname.startsWith("/tenant") ||
     pathname.startsWith("/registration");
 
   return (
@@ -69,13 +74,15 @@ export default function RootLayout({ children }: LayoutProps) {
       <body className="bg-light">
         {loading && <Loader />}
 
+        {/* ToastProvider must be ALWAYS available */}
+        <ToastProvider />
+
         {!hideLayout ? (
           <>
             <TopBar />
             <div className="container px-0">
               <LogoHeader />
               <MainNavbar />
-              <ToastProvider />
               {children}
             </div>
           </>

@@ -3,17 +3,15 @@ import type { NextRequest } from "next/server";
 
 export default function middleware(request: NextRequest) {
 
-    const token =
-        request.cookies.get("token")?.value ||
-        request.headers.get("Authorization")?.replace("Bearer ", "");
+    const token = request.cookies.get("token")?.value;
 
-    const publicRoutes = ["/login", "/", "/registration"];
+    // Routes that do NOT require login
+    const publicRoutes = ["/", "/login", "/registration"];
 
-    const isPublic = publicRoutes.some((path) =>
-        request.nextUrl.pathname.startsWith(path)
-    );
+    const pathname = request.nextUrl.pathname;
+    const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
 
-    // If trying to access protected page without token → redirect
+    // Block access if protected route and no token
     if (!isPublic && !token) {
         return NextResponse.redirect(new URL("/login", request.url));
     }
@@ -32,5 +30,8 @@ export const config = {
         "/banking/:path*",
         "/Accounting/:path*",
         "/more/:path*",
+        "/tenant/:path*",
+        "/admin/:path*",
+        "/employee/:path*",
     ],
 };

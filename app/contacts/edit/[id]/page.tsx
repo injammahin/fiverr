@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/app/config/api";
-import { useToast } from "@/app/components/TopBar";
+// import { useToast } from "@/app/components/TopBar";
 import toast from "react-hot-toast";
 
 const createInitialForm = () => ({
@@ -55,7 +55,7 @@ export default function EditContactPage() {
   const id = params.id;
 
   const router = useRouter();
-  const { showSuccess, showError } = useToast();
+  // const { showSuccess, showError } = useToast();
 
   const [form, setForm] = useState(createInitialForm());
   const [loading, setLoading] = useState(false);
@@ -74,7 +74,7 @@ export default function EditContactPage() {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        showError("Session expired");
+        toast("Session expired");
         router.push("/login");
         return;
       }
@@ -87,7 +87,7 @@ export default function EditContactPage() {
       });
 
       if (!res.ok) {
-        showError("Failed to load contact");
+        toast("Failed to load contact");
         router.push("/contacts");
         return;
       }
@@ -99,7 +99,7 @@ export default function EditContactPage() {
       });
     } catch (err) {
       console.log(err);
-      showError("Error loading contact");
+      toast("Error loading contact");
     }
 
     setFetching(false);
@@ -119,7 +119,7 @@ export default function EditContactPage() {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        showError("Please login again.");
+        toast("Please login again.");
         router.push("/login");
         return;
       }
@@ -146,16 +146,16 @@ export default function EditContactPage() {
       }
 
       if (!response.ok) {
-        showError(data.message || "Update failed");
+        toast(data.message || "Update failed");
         setLoading(false);
         return;
       }
 
-      showSuccess("Contact updated successfully");
+      toast("Contact updated successfully");
       router.push("/contacts");
     } catch (err) {
       console.log(err);
-      showError("Network error");
+      toast("Network error");
     }
 
     setLoading(false);

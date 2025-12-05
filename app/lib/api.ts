@@ -1,12 +1,11 @@
+// app/config/api.ts
 import axios from "axios";
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
-export const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000";
-
 export const API = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api",
 });
 
+// Add token automatically
 API.interceptors.request.use((config) => {
     if (typeof window !== "undefined") {
         const token = localStorage.getItem("token");

@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/app/config/api";
-import { useToast } from "@/app/components/TopBar";
+// import { useToast } from "@/app/components/TopBar";
 import toast from "react-hot-toast";
 // --------------------------------------------
 // Helper to update form fields
@@ -65,7 +65,7 @@ export default function ContactForm() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-  const { showSuccess, showError } = useToast();
+  // const { showSuccess, showError } = toast();
 
   const update = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
@@ -82,7 +82,7 @@ export default function ContactForm() {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        showError("Authentication error. Please login again.");
+        toast("Authentication error. Please login again.");
         router.push("/login");
         return;
       }
@@ -109,20 +109,20 @@ export default function ContactForm() {
       }
       // Handle failure
       if (!response.ok) {
-        showError(data.message || "Something went wrong");
+        toast(data.message || "Something went wrong");
         setLoading(false);
         return;
       }
 
       // Success
-      showSuccess("Contact saved successfully!");
+      toast("Contact saved successfully!");
       setTimeout(() => {
         router.push("/contacts");
       }, 1000);
 
     } catch (err) {
       console.error("API error:", err);
-      showError("Network error. Please try again.");
+      toast("Network error. Please try again.");
     }
 
     setLoading(false);
